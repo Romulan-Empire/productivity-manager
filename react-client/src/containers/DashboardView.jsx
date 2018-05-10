@@ -6,8 +6,10 @@ import React from 'react';
 // window.io = io;
 
 import { addActivity } from '../actions/activityActions'
+
 import ActivityContainer from './ActivityContainer.jsx';
 import ProductivityScore from './ProductivityScore.jsx';
+
 import Paper from 'material-ui/Paper';
 import AppBar from 'material-ui/AppBar';
 import FlatButton from 'material-ui/FlatButton';

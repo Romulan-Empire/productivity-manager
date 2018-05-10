@@ -15,10 +15,12 @@ const initialState = {
     {'id': 2,'app': 'Chrome', 'title': 'Youtube - WTF IS REDUX', 'spurts': [{'startTime': "May 7th 2018, 5:51:26 pm", 'endTime': "May 7th 2018, 5:51:46 pm"}], 'duration': 76},
   ],
   distracting: [
+
     {'id': 3,'app': 'Google Chrome', 'title': '', 'spurts': [{'startTime': "May 7th 2018, 5:51:26 pm", 'endTime': "May 7th 2018, 5:51:46 pm"}], 'duration': 45},
     {'id': 4,'app': 'Google Chrome', 'title': 'Store - Redux', 'spurts': [{'startTime': "May 7th 2018, 5:51:26 pm", 'endTime': "May 7th 2018, 5:51:46 pm"}], 'duration': 108},
   ],
   nextId: 5
+
 }
 
 const activities = (state = initialState, action) => {
