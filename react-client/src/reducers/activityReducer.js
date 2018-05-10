@@ -43,21 +43,14 @@ const activities = (state = initialState, action) => {
         [category]: [
                     ...state[category].slice(0,index),
                     activity,
-                    ...state[category].slice(index + 1)
+                    ...state[category].slice(index+1)
                     ]
       }
-    case CATEGORIZE_ACTIVITY:
-      // console.log('got dispatch', action.payload)
-      let {id, oldCatName, newCatName} = action.payload;
-      const movingActivity = state[oldCatName].filter((el) => el.id === id)[0];
-      const updatedOldCat = state[oldCatName].filter((el) => el.id !== id);
-      const updatedNewCat = [...state[newCatName] , movingActivity];
-      // console.log('here is your new stuff in the reducer', movingActivity, updatedOldCat, updatedNewCat)
-      return {
-        ...state,
-        [oldCatName]: updatedOldCat,
-        [newCatName]: updatedNewCat
-      };
+    // case CATEGORIZE_ACTIVITY:
+    //   return {
+    //     ...state,
+    //     activities: [... state.activities, action.payload]
+    //   }
     default: 
       // console.log('default', state)
       return state;

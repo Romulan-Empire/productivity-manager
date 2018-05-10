@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import ProductivityScore from '../../containers/ProductivityScore.jsx';
-import {changeCategory} from '../../actions/activityActions';
 
 import Paper from 'material-ui/Paper';
 import Divider from 'material-ui/Divider';
@@ -104,12 +103,7 @@ const renderActivities = (category, activities) => {
   
 
             <br/>
-            <button name="productive" onClick={(e) => {
-                changeCategory(activity.id, category, 'productive')}
-              }>productive</button>
-            <button onClick={() => {changeCategory(activity.id, category, 'neutral')}}>neutral</button>
-            <button onClick={() => {changeCategory(activity.id, category, 'distracting')}}>distracting</button>
-
+            <button>productive</button> <button>neutral</button> <button>distracting</button>
           </Paper>
         )
       })}
@@ -118,7 +112,8 @@ const renderActivities = (category, activities) => {
   );
 }
 
-const Activity = ({ activities, clickHandler }) => {
+const Activity = ({activities}) => {
+
   const style = {
     margin: '8px',
     padding: '10px',
@@ -132,13 +127,13 @@ const Activity = ({ activities, clickHandler }) => {
   return (
     <div>
       <Paper style={style}>
-        {renderActivities('productive', activities, clickHandler)}
+        {renderActivities('productive', activities)}
       </Paper>
       <Paper style={style}>
-        {renderActivities('neutral', activities, clickHandler)}
+        {renderActivities('neutral', activities)}
       </Paper>
       <Paper style={style}>
-        {renderActivities('distracting', activities, clickHandler)}
+        {renderActivities('distracting', activities)}
       </Paper>
       <Paper style={style}>
         <ProductivityScore />
@@ -177,16 +172,9 @@ const Activity = ({ activities, clickHandler }) => {
     margin: '0px 0px 15px 0px'
   };
 
+
 const mapStateToProps = state => ({
   activities: state.activities
 })
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    clickHandler: (id, oldCat, newCat) => {
-      if (oldCat !== newCat) dispatch(changeCategory(id, oldCat, newCat));
-    }
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Activity) 
+export default connect(mapStateToProps)(Activity) 

@@ -33,7 +33,7 @@ const monitorActivity = (activities, errors) => {
     else if (chunkComplete(lastActivity, newActivity)) {
       lastActivity.endTime = timestamp();
       activities.push(newActivity);
-      return lastActivity;
+      return newActivity;
     }
   })
   .catch((e) => {

@@ -1,4 +1,6 @@
-import { GET_ACTIVITIES, ADD_ACTIVITY, PATCH_ACTIVITY, CATEGORIZE_ACTIVITY } from './types'; 
+//action is description of how state should "change"
+//does not actually manipulate store
+import { GET_ACTIVITIES, ADD_ACTIVITY, PATCH_ACTIVITY, DELETE_ACTIVITY } from './types'; 
 import { createStore } from 'redux';
 import moment from 'moment';
 
@@ -12,7 +14,7 @@ export const addActivity = (data) => (dispatch, getState) => {
   const {activities} = getState()
   let activityInState = checkState(data, activities)
   if(activityInState){
-    // console.log('already in state. update duration!')
+    console.log('already in state. update duration!')
     dispatch(patchActivity(activityInState, data));
   } else {
     console.log('not in state. update state!')
@@ -72,23 +74,6 @@ export const patchActivity = ({activity, category, index}, data) => (dispatch, g
     type: PATCH_ACTIVITY,
     payload: {'activity': updatedActivity, 'category': category, 'index': index}
   })
-}
-
-export const changeCategory = (id, oldCatName, newCatName) => {
-  // const {activities} = getState();
-  // console.log('activities inside action creator', activities);
-  // const activityArr = activities[oldCatName].filter((activity) => activity.id === id)[0];
-  // const updatedOldCat = activities[oldCatName].filter((activity) => activity.id !== id);
-  // const updatedNewCat = [...activities[newCatName] , activity];
-  return {
-    type: CATEGORIZE_ACTIVITY,
-    payload: {
-      id,
-      oldCatName,
-      newCatName
-    }
-  }
-  // dispatch({type: CATEGORIZE_ACTIVITY, payload: {oldCatName, newCatName}})
 }
 
 
