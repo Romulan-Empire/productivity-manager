@@ -37,10 +37,10 @@ const getProductivityClass = (appName, title) => {
   return pool.query(queryStr, values)
     .then((data) => {
       if (data.rows.length) {
-        console.log('productivity class is', data.rows[0].prod_class)
+        // console.log('productivity class is', data.rows[0].prod_class)
         return data.rows[0].prod_class
       } else {
-        console.log('productivity class not found')
+        // console.log('productivity class not found')
         return null;
       }
     })
@@ -53,16 +53,18 @@ const addOrChangeProductivity = (query) => {
   return getProductivityClass(app_name, window_title) //add user here later
     .then(result => {
       if (result) {
-        console.log('gotta recategorize!')
+        // console.log('gotta recategorize!')
         return changeProductivityClass(query)
       }
       else {
-        console.log('gotta add productivity!')
+        // console.log('gotta add productivity!')
         return addProductivityClass(query);
       }
     })
     .catch(err => console.log('error checking for productivity!'))
 };
+
+//ADD DELETE FUNCTIONALITY FOR USER
 
 const addProductivityClass = ({user_name, app_name, window_title, prod_class}) => {
   const queryStr = `INSERT INTO public.categories(user_name, app_name, window_title, prod_class)\
@@ -80,6 +82,14 @@ const changeProductivityClass = ({user_name, app_name, window_title, prod_class}
   return pool.query(queryStr, values)
     .catch(err => console.error('error in changing prod_class', err)) 
 };
+
+const getBrowserActivities = () => {
+  //expand to other browsers!
+  const queryStr = `select app_name, window_title, prod_class from public.categories where app_name = 'Google Chrome'`;
+  return pool.query(queryStr)
+    .then(data => data.rows)
+    .catch(err => console.error('error getting all browser titles', err))
+}
 
 //changeProductivityClass
 
@@ -214,6 +224,7 @@ const insertError = () => {
 exports.getActivities = getActivities;
 exports.getProductivityClass = getProductivityClass;
 exports.addOrChangeProductivity = addOrChangeProductivity;
+exports.getBrowserActivities = getBrowserActivities;
 // insertActivity();
 // getActivities();
 

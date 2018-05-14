@@ -13,7 +13,7 @@ class App extends React.Component {
       <div>  
       <MuiThemeProvider>
       <Provider store={store}>
-          <MonitorContainer />
+        <MonitorContainer />
       </Provider>
       </MuiThemeProvider>
 
