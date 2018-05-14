@@ -64,6 +64,8 @@ const addOrChangeProductivity = (query) => {
     .catch(err => console.log('error checking for productivity!'))
 };
 
+//ADD DELETE FUNCTIONALITY FOR USER
+
 const addProductivityClass = ({user_name, app_name, window_title, prod_class}) => {
   const queryStr = `INSERT INTO public.categories(user_name, app_name, window_title, prod_class)\
                     VALUES ($1, $2, $3, $4)`;
@@ -80,6 +82,14 @@ const changeProductivityClass = ({user_name, app_name, window_title, prod_class}
   return pool.query(queryStr, values)
     .catch(err => console.error('error in changing prod_class', err)) 
 };
+
+const getBrowserActivities = () => {
+  //expand to other browsers!
+  const queryStr = `select app_name, window_title, prod_class from public.categories where app_name = 'Google Chrome'`;
+  return pool.query(queryStr)
+    .then(data => data.rows)
+    .catch(err => console.error('error getting all browser titles', err))
+}
 
 //changeProductivityClass
 
@@ -214,6 +224,7 @@ const insertError = () => {
 exports.getActivities = getActivities;
 exports.getProductivityClass = getProductivityClass;
 exports.addOrChangeProductivity = addOrChangeProductivity;
+exports.getBrowserActivities = getBrowserActivities;
 // insertActivity();
 // getActivities();
 
