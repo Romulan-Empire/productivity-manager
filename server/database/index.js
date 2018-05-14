@@ -37,10 +37,10 @@ const getProductivityClass = (appName, title) => {
   return pool.query(queryStr, values)
     .then((data) => {
       if (data.rows.length) {
-        console.log('productivity class is', data.rows[0].prod_class)
+        // console.log('productivity class is', data.rows[0].prod_class)
         return data.rows[0].prod_class
       } else {
-        console.log('productivity class not found')
+        // console.log('productivity class not found')
         return null;
       }
     })
@@ -53,11 +53,11 @@ const addOrChangeProductivity = (query) => {
   return getProductivityClass(app_name, window_title) //add user here later
     .then(result => {
       if (result) {
-        console.log('gotta recategorize!')
+        // console.log('gotta recategorize!')
         return changeProductivityClass(query)
       }
       else {
-        console.log('gotta add productivity!')
+        // console.log('gotta add productivity!')
         return addProductivityClass(query);
       }
     })

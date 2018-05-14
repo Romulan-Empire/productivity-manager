@@ -12,7 +12,13 @@ app.use(bodyParser.json());
 app.get('/api/classifications', (req, res) => {
   const {user_name, app_name, window_title} = req.query;
   return db.getProductivityClass(app_name, window_title)
-    .then((prod_class) => res.send(prod_class))
+    .then((prod_class) => {
+      console.log(`prod_class is ${prod_class} and app_name is ${app_name}`) //seems to lag one behind??
+      if (prod_class === null && app_name === 'Google Chrome') {
+        naiveBayes.predictProducitivityClass(window_title);
+      }
+      res.send(prod_class);
+    })
     .catch((err) => res.send(err));
 });
 
@@ -23,7 +29,7 @@ app.post('/api/classifications', (req, res) => {
 });
 
 app.get('/learn', (req, res) => {
-  naiveBayes();
+  naiveBayes.predictProducitivityClass('The Time Has Come for a Better Breast Pump');
 });
 
 let server = app.listen(port, () => {
