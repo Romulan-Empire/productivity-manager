@@ -25,6 +25,7 @@ getBrowserActivities()
 
   // learn either periodically using a cron or on every new user categorization
     // if latter, need to also recognize recategorizations and deletes
+    
 const predictProducitivityClass = (title) => {
   console.log(`predicting productivity class of ${title}`)
   console.log(classifier.categorize(title));
