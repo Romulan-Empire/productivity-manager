@@ -1,6 +1,5 @@
 import { START_POM, PAUSE_POM, RESUME_POM, CLEAR_POM, COMPLETE_SPURT, SET_POM_PREFS } from '../actions/types';
 import moment from 'moment';
-import Notification from 'node-mac-notifier';
 
 const timestamp = () => {
   return moment().format('LTS');

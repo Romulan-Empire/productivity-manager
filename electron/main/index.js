@@ -16,7 +16,7 @@ let mainWindow, popUpWindow, tray, splash;
 let force_quit = false;
 
 const createTray = () => {
-  let image = nativeImage.createFromPath(path.join(__dirname, '../iconTemplate.png'))
+  let image = nativeImage.createFromPath(path.join(__dirname, '../leaf.png'))
   tray = new Tray(image);
   tray.setToolTip('Thyme');
   tray.on('click', () => {
@@ -31,8 +31,8 @@ const createWindow = () => {
   })
 
   splash = new BrowserWindow({
-    width: 400, 
-    height: 400, 
+    width: 150, 
+    height: 150, 
     transparent: true,
     frame: false, 
     alwaysOnTop: true
@@ -144,6 +144,10 @@ app.on('ready', () => {
   });
 });
 
+app.on('activate', () => { 
+  mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+});
+
 ipcMain.on('got-idle-activity', (event, message) => {
   mainWindow.webContents.send('add-idle-activity', message)
   popUpWindow.hide()
@@ -161,13 +165,11 @@ const mainMenuTemplate = [
     label: 'File', 
     submenu: [ 
       {
-        label: 'Add Item', 
+        label: 'Hide/Show', 
+        accelerator: process.platform === 'darwin' ? 'Command+W' : 'Ctrl+W',
         click(){
-          createAddWindow();
+          mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
         }
-      }, 
-      {
-        label: 'Clear Items'
       },
       {
         label: 'Quit',

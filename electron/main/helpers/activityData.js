@@ -94,6 +94,7 @@ const sanitizeTitle = (title) => {
     'Notification settings': ' ',
     'Google Accounts': ' ',
     'Google Search': ' ',
+    'Untitled': ' ',
     'Gmail': 'Gmail',
     'Stack Overflow': 'Stack Overflow',
     'JSFiddle': 'JSFiddle'
