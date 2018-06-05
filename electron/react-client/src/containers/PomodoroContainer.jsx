@@ -119,7 +119,7 @@ class PomodoroContainer extends React.Component {
           
           <PieChart width={400} height={500}>
             <Pie dataKey="value" data={currentSpurtData} cx={200} cy={200} innerRadius={70} outerRadius={90} fill="#82ca9d">
-              <Label 
+              <Label
                 value={pomodoro.currentSpurt.type + ":  " + formatMSToMS(currentSpurtData[1].value)} 
                 position="center" /> 
               <Cell fill={'#00C49F'}/>
