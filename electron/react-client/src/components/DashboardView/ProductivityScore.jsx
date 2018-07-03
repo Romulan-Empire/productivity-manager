@@ -1,6 +1,4 @@
 import React from "react";
-import Paper from "material-ui/Paper";
-
 import ReactSpeedometer from "react-d3-speedometer";
 
 class ProductivityScore extends React.Component {

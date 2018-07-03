@@ -1,7 +1,10 @@
-import { ADD_ACTIVITY, PATCH_ACTIVITY, CATEGORIZE_ACTIVITY, DELETE_ACTIVITY, SET_ALL_ACTIVITIES, AFFIRM_CATEGORIZATION } from './types'; 
+import { ADD_ACTIVITY, PATCH_ACTIVITY, CATEGORIZE_ACTIVITY, DELETE_ACTIVITY, SET_ALL_ACTIVITIES, TOGGLE_ACTIVITY_VIEW, AFFIRM_CATEGORIZATION } from './types'; 
 import moment from 'moment';
 import axios from 'axios';
-import { serverURL } from '../../config.js';
+
+const config = require('../../reactConfig.js');
+const serverURL = process.env.NODE_ENV === 'localhost' ? config.localhost : config.server;
+console.log('server url is', serverURL);
 
 export const addActivity = (data) => {
   return {
@@ -14,14 +17,17 @@ export const deleteActivity = (activity, category, isTracked, user) => {
   let id = activity.id;
 
   const params = {
-    user_name: user,
+    user_name: user.user,
     app_name: activity.app,
     window_title: activity.title,
     prod_class: category,
     isTracked: isTracked
   }
+  const headers = {
+    'Authorization': `${user.user} ${user.jwt}`
+  }
 
-  const request = axios.delete(serverURL + '/api/classifications', {data: params});
+  const request = axios.delete(serverURL + '/api/classifications', {headers, data: params},);
   return {
     type: DELETE_ACTIVITY,
     payload: {id, category}
@@ -37,7 +43,7 @@ export const patchActivity = ({ activity, category, index }, data) => {
 
 export const changeCategory = (activity, oldCatName, newCatName, isTracked, user, wasML) => {
   const changeParams = {
-    user_name: user,
+    user_name: user.user,
     app_name: activity.app,
     window_title: activity.title,
     old_prod_class: oldCatName,
@@ -47,15 +53,19 @@ export const changeCategory = (activity, oldCatName, newCatName, isTracked, user
   };
 
   const deleteParams = {
-    user_name: user,
+    user_name: user.user,
     app_name: activity.app,
     window_title: activity.title,
     prod_class: oldCatName,
     isTracked: isTracked
   };
 
-  const request = newCatName === 'neutral' ? axios.delete(serverURL + '/api/classifications', {data: deleteParams}) :
-  axios.post(serverURL + '/api/classifications', {params: changeParams});
+  const headers = {
+    'Authorization': `${user.user} ${user.jwt}`
+  }
+
+  const request = newCatName === 'neutral' ? axios.delete(serverURL + '/api/classifications', {headers, data: deleteParams}) :
+  axios.post(serverURL + '/api/classifications', {params: changeParams}, {headers});
   
   return {
     type: CATEGORIZE_ACTIVITY,
@@ -70,14 +80,20 @@ export const changeCategory = (activity, oldCatName, newCatName, isTracked, user
 
 export const affirmCategorization = (activity, category, isTracked, user) => {
   const params = {
-    user_name: user,
+    user_name: user.user,
     app_name: activity.app,
     window_title: activity.title,
     prod_class: category,
     isTracked: isTracked,
     ml: 'affirm'
   };
-  const request = axios.post(serverURL + '/api/classifications', {params: params});
+
+  const headers = {
+    'Authorization': `${user.user} ${user.jwt}`
+  }
+  console.log('headers are', headers)
+
+  const request = axios.post(serverURL + '/api/classifications', {params: params}, {headers});
   return {
     type: AFFIRM_CATEGORIZATION,
     payload: {
@@ -88,10 +104,19 @@ export const affirmCategorization = (activity, category, isTracked, user) => {
 }
 
 export const setAllActivities = (data) => {
-  // console.log('in set all activities', data)
   return {
     type: SET_ALL_ACTIVITIES,
     payload: data
   }
 }
 
+
+export const toggleActivityView = (toShow, category) => {
+  return {
+    type: TOGGLE_ACTIVITY_VIEW,
+    payload: {
+      toShow,
+      category
+    }
+  }
+}

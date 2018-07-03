@@ -1,10 +1,10 @@
 import { connect } from 'react-redux';
 import React from 'react';
 import Paper from 'material-ui/Paper';
-import {Tabs, Tab} from 'material-ui/Tabs';
-import {PieChart, Pie, Label} from 'recharts';
-import {RadialBar, RadialBarChart, Legend} from 'recharts';
-import {LineChart, XAxis, CartesianGrid, Line, Tooltip} from 'recharts';
+import { Tabs, Tab } from 'material-ui/Tabs';
+import { PieChart, Pie, Label } from 'recharts';
+import { RadialBar, RadialBarChart, Legend } from 'recharts';
+import { LineChart, XAxis, CartesianGrid, Line, Tooltip } from 'recharts';
 
 import ChartTopRankings from '../components/AnalyticsView/ChartTopRankings.jsx';
 import ActivityRadarChart from '../components/AnalyticsView/ActivityRadarChart.jsx';
@@ -13,18 +13,9 @@ import ActivityTreeMap from '../components/AnalyticsView/ActivityTreeMap.jsx';
 class AnalyticsContainer extends React.Component {
   constructor(props) {
     super(props);
-
   }
 
-  render() {
-
-
-    const data = [
-      {name: 'productive', uv: 31.47, pv: 2400, fill: '#8884d8'},
-      {name: 'neutral', uv: 26.69, pv: 4567, fill: '#83a6ed'},
-      {name: 'distracting', uv: 15.69, pv: 1398, fill: '#8dd1e1'},
-    ];
-    
+  render() {    
     const style = {
       top: 0,
       left: 350,
@@ -67,16 +58,12 @@ const styleButton = {
   background: '#333', 
   fontWeight: 'bold', 
   fontSize: '80%', 
-  // borderRadius: '6px 6px 0px 0px',
   height: '25px'
 };
 
 const stylePaper = {
   background: 'white',
   padding: '15px',
-  // minHeight: '575px',
-  // maxHeight: '575px',
-  // overflowY: 'scroll'
 };
 
 const mapStateToProps = (state) => {

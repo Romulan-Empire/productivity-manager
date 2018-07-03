@@ -1,4 +1,4 @@
-import { ADD_ACTIVITY, PATCH_ACTIVITY, CATEGORIZE_ACTIVITY,
+import { ADD_ACTIVITY, PATCH_ACTIVITY, CATEGORIZE_ACTIVITY, TOGGLE_ACTIVITY_VIEW,
         DELETE_ACTIVITY, SET_ALL_ACTIVITIES, AFFIRM_CATEGORIZATION } from '../actions/types'; 
 import moment from 'moment';
 
@@ -10,24 +10,22 @@ const initialState = {
 }
 
 const activities = (state = initialState, action) => {
-
   switch (action.type) {
     case ADD_ACTIVITY: {
-      // console.log('action payload', action.payload)
-      const {app, title, startTime, endTime, productivity} = action.payload
+      const { app, title, startTime, endTime, productivity, toShow } = action.payload
       const duration = getDuration(startTime, endTime)
       const convertedProd = {
         ...productivity,
         class: productivity.class || 'neutral'
       };
-      // console.log('converted productivity inside add activity reducer', convertedProd)
       const newData = {
         'id': state.nextId,
         'app': app,
         'title': title,
         'spurts': [{'startTime': startTime, 'endTime': endTime}],
         'duration': duration,
-        'productivity': convertedProd
+        'productivity': convertedProd,
+        'toShow': toShow
       }
       return {
         ...state,
@@ -75,14 +73,28 @@ const activities = (state = initialState, action) => {
           class: newCatName
         }
       };
-      // console.log('updated moving activity is', updatedActivity)
       const updatedOldCategoryActivities = state[oldCatName].filter((el) => el.id !== id);
       const updatedNewCategoryActivities = [...state[newCatName] , updatedActivity];
+
       return {
         ...state,
         [oldCatName]: updatedOldCategoryActivities,
         [newCatName]: updatedNewCategoryActivities
       };
+    }
+
+    case TOGGLE_ACTIVITY_VIEW: {
+      // console.log('in activity reducer', action.payload)
+      const { toShow, category } = action.payload;
+
+      let updatedCategory = state[category].map((el) => {
+        el.toShow = toShow ? 1 : 0
+        return el;
+      })
+      return {
+        ...state,
+        [category] : updatedCategory
+      }
     }
 
     case AFFIRM_CATEGORIZATION: {
@@ -96,7 +108,7 @@ const activities = (state = initialState, action) => {
           class: prodClass
         }
       }
-      // console.log('affirmed activity is', affirmedActivity);
+
       return {
         ...state,
         [prodClass]: [
@@ -107,12 +119,10 @@ const activities = (state = initialState, action) => {
       }
     }
     case SET_ALL_ACTIVITIES: {
-      // console.log('payload inside set all activities is', action.payload)
       let neutral = []
       let productive = []
       let distracting = []
       action.payload.forEach((activity) => {
-        // console.log('activity inside set all activities is', activity)
         if (activity.productivity.class === 'neutral') neutral.push(activity);
         if (activity.productivity.class === 'productive') productive.push(activity);
         if (activity.productivity.class === 'distracting') distracting.push(activity);

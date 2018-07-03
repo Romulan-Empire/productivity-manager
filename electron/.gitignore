@@ -5,6 +5,7 @@ react-client/.DS_Store
 react-client/dist/bundle.js
 package-lock.json
 react-client/config.js
+react-client/reactConfig.js
 main/config.js
 config.js
 out

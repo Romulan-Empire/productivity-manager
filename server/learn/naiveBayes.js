@@ -16,7 +16,6 @@ const syncClassifierToDb = new CronJob({
 });
 
 const initClassifier = async () => {
-  //wipe classifier and resync to db
   classifier = null;
   classifier = bayes();
   const activities = await getBrowserActivities();
@@ -43,7 +42,6 @@ const predictProductivityClass = (title, user_name) => {
   else return null;
 };
 
-//real time learning
 const learnProductivityClass = (title, productivityClass) => {
   classifier.learn(title, productivityClass);
   console.log(`ml is learning that ${title} is ${productivityClass}`);
@@ -53,16 +51,6 @@ const unlearnProductivityClass = (title, oldProdClass) => {
   classifier.unlearn(title, oldProdClass);
   console.log(`ml is UNlearning that ${title} was classified ${oldProdClass}`);
 }
-
-//periodic loading and saving
-const saveClassifier = () => {
-  const classifierJSON = classifier.toJson(); 
-  //save this JSON to database
-};
-
-const loadClassifier = (classifierJSON) => {
-  classifier = bayes.fromJson(classifierJSON)
-};
 
 exports.initClassifier = initClassifier;
 exports.predictProductivityClass = predictProductivityClass;

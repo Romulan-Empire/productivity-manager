@@ -1,13 +1,14 @@
-const { createTable, insertActivities, insertPreferences, getActivities, insertSpurts,
+const { createTables, insertActivities, insertPreferences, getActivities, insertSpurts,
         getSpurts, clearDb, closeDb } = require('../../database/sqlite.js');
 const { ipcMain } = require('electron');
-
 
 const populateStore = (mainWindow) => {
   let trackedApps = ['Google Chrome', 'Firefox', 'Safari', 'Idle']; //change to get prefs from db
   let newActivities;
-  createTable();
-  getActivities()
+  createTables()
+    .then(() => {
+      return getActivities();
+    })
     .then((activities) => {
       newActivities = activities.map(activityObj => {
         const mappedAct = {
@@ -17,7 +18,7 @@ const populateStore = (mainWindow) => {
             class: activityObj.productivity
           }
         }
-        const {source, ...noSource} = mappedAct;
+        const { source, ...noSource } = mappedAct;
         return noSource;
       });
       return getSpurts()
@@ -30,7 +31,7 @@ const populateStore = (mainWindow) => {
                     spurt.title === activity.title && spurt.app === activity.app : 
                     spurt.app === activity.app
 
-          if(query){
+          if (query) {
             activity.spurts = activity.spurts || []
             activity.spurts.push({
               startTime: spurt.startTime,
@@ -39,9 +40,9 @@ const populateStore = (mainWindow) => {
           }
         }
       })
-      mainWindow.send('sqlActivities', newActivities) //IT IS BREAKING HERE WHY!
+      mainWindow.send('sqlActivities', newActivities)
     })
-
+    .catch((err) => console.error('error populating store from local db:', err))
 }
 
 const saveStoreToSql = (mainWindow) => {
@@ -50,18 +51,18 @@ const saveStoreToSql = (mainWindow) => {
     mainWindow.send("windowClose", "close")
     ipcMain.once("store", (event, data) => {
       let { activities, preferences } = JSON.parse(data);
-      for(let category in activities){
-        if(category !== 'nextId'){
+      for (let category in activities) {
+        if (category !== 'nextId') {
           activities[category].forEach((el) => {
             el.spurts.forEach((spurt) => {
-              insertSpurts(el, spurt)
+              insertSpurts(el, spurt);
             })
-            insertActivities(el)
+            insertActivities(el);
           })
         }
       }
   
-      for(let category in preferences){ //ex: category = trackedApps, el = Google Chrome
+      for (let category in preferences) {
         preferences[category].forEach((el) => (insertPreferences(el, category)))
       }
     })

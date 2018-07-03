@@ -1,10 +1,7 @@
 import { connect } from 'react-redux';
-import ReactDOM from 'react-dom';
 import React from 'react';
-import { ipcRenderer } from 'electron';
-import axios from 'axios';
 
-import { changeCategory, deleteActivity, affirmCategorization } from '../actions/activityActions'
+import { changeCategory, deleteActivity, affirmCategorization, toggleActivityView } from '../actions/activityActions'
 import ProductivityScore from './ProductivityScore.jsx';
 import ActivityGroup from '../components/DashboardView/ActivityGroup.jsx';
 
@@ -16,7 +13,7 @@ class DashboardContainer extends React.Component {
   }
   
   render() {
-    const { activities, changeCategory, deleteActivity, preferences, user, affirmCategorization } = this.props;
+    const { activities, changeCategory, deleteActivity, preferences, user, affirmCategorization, toggleActivityView } = this.props;
     
     return (
       <div style={{margin: '0px', background: 'white'}}>
@@ -27,8 +24,9 @@ class DashboardContainer extends React.Component {
             changeCategory={changeCategory}
             deleteActivity={deleteActivity}
             preferences={preferences}
-            user={user.user}
+            user={user}
             affirmCategorization={affirmCategorization}
+            toggleActivityView={toggleActivityView}
           />
           <ActivityGroup
             category='neutral'
@@ -36,8 +34,9 @@ class DashboardContainer extends React.Component {
             changeCategory={changeCategory}
             deleteActivity={deleteActivity}
             preferences={preferences}
-            user={user.user}
+            user={user}
             affirmCategorization={affirmCategorization}
+            toggleActivityView={toggleActivityView}
           />
           <ActivityGroup
             category='distracting'
@@ -45,8 +44,9 @@ class DashboardContainer extends React.Component {
             changeCategory={changeCategory}
             deleteActivity={deleteActivity}
             preferences={preferences}
-            user={user.user}
+            user={user}
             affirmCategorization={affirmCategorization}
+            toggleActivityView={toggleActivityView}
           />
         </Paper>
         <Paper zDepth={1} style={{borderRadius: '15 15 15 15', display: 'inline-block', background: 'white', margin: '0', padding: '90px 0px 0px 0px', width: '25%', height: '450px', verticalAlign: 'top'}}>
@@ -77,6 +77,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     affirmCategorization: (activity, category, isTracked, user) => {
       dispatch(affirmCategorization(activity, category, isTracked, user))
+    },
+    toggleActivityView: (toShow, category) => {
+      dispatch(toggleActivityView(toShow, category))
     }
   };
 };

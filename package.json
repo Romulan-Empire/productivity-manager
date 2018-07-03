@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Productivity Manager",
   "scripts": {
-    "start": "electron electron/main/index.js",
-    "electron-forge": "electron-forge start electron/main/index.js"
+    "electron-dev": "cd electron && npm start",
+    "server-dev": "cd server && npm run dev",
+    "local-electron-dev": "NODE_ENV=localhost npm run electron-dev",
+    "mock-production-electron-dev": "NODE_ENV=production npm run electron-dev"
   },
   "repository": {
     "type": "git",
@@ -19,8 +21,8 @@
     "url": "https://github.com/Romulan-Empire/productivity-manager/issues"
   },
   "homepage": "https://github.com/Romulan-Empire/productivity-manager#readme",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
+    "jsonwebtoken": "^8.3.0"
   }
 }

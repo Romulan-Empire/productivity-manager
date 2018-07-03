@@ -15,8 +15,6 @@ const msToMinutes = (ms) => {
 
 const minutesToMs = (minutes) => minutes * 60 * 1000;
 
-//should not be able to update if pom is still running!
-
 class SettingsContainer extends React.Component {
   constructor(props) {
     super(props);
@@ -49,7 +47,6 @@ class SettingsContainer extends React.Component {
   }
 
   handleChange(attr, value) {
-    console.log('slider event target is', attr, value)
     this.setState({
       [attr]: value
     });

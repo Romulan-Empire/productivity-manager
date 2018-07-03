@@ -31,7 +31,6 @@ const collect = (connect, monitor) => {
   }
 }
 
-//stylizing the "suggested by thyme.ly" line
 const insertColorIntoStyle = (category) => {
   let color = {
     'productive': '#43A047',
@@ -47,7 +46,6 @@ const insertColorIntoStyle = (category) => {
   return style;
 }
 
-//make long pieces of text shorter and end with '...' 
 const prettifier = (text) => {
   let results = text;
 
@@ -63,43 +61,18 @@ const prettifier = (text) => {
 }
 
 const ActivityCard = (props) => {
-  const { activity, category, deleteActivity, index, preferences, user, affirmCategorization } = props;
+  const { activity, category, deleteActivity, index, preferences, user, affirmCategorization, connectDragSource, isDragging } = props;
   
   let formattedDuration = moment.duration(activity.duration, "seconds").format("h[h] m[m] s[s]");
+  coreStyle.background = (index % 2 === 0) ? colorMap[category]['tick'] : colorMap[category]['tock']
+  let isTracked = preferences.trackedApps.includes(activity.app) ? true : false
 
-  let coreStyle = {
-    font: 'Roboto', 
-    padding: '10px 15px 15px 5px',
-    margin: '0px 8x 0px 8px',
-    textAlign: 'left',
-    background: 'white',
-    color: 'black',
-    fontSize: '80%',
-  };
-
-  let colorMap = {
-    'productive': {tick: '#DCEDC8', tock: '#C5E1A5' },
-    'neutral': {tick: '#FFF9C4', tock: '#FFF59D' },
-    'distracting': {tick: '#FFCCBC', tock: '#FFAB91'}
+  if(!activity.toShow) {
+    console.log('dont show!')
+    return null;
   }
-
-  if (index % 2 === 0) {
-    coreStyle.background = colorMap[category]['tick'];
-  } else {
-    coreStyle.background = colorMap[category]['tock'];
-  }
-
-  const { connectDragSource, isDragging } = props;
-
-  let isTracked;
-  if (preferences.trackedApps.includes(activity.app)) {
-    isTracked = true;
-  } else {
-    isTracked = false;
-  }
-
+  else {  
     return connectDragSource(
-      //React DnD requires components to be wrapped in a <div> and not <Paper>
       <div> 
         <Paper
           key={activity.title + index}
@@ -130,29 +103,20 @@ const ActivityCard = (props) => {
             {activity.productivity.source === 'ml' 
             ? <div>
                 <i style={insertColorIntoStyle(category)}>Suggested By Thyme.ly</i>&nbsp;
-                {/* <button onClick={() => {affirmCategorization(activity, category, isTracked, user)}}>✔️
-                </button> */}
                 <CheckMarkIcon style={{position: 'relative', top: '5'}} onClick={() => {affirmCategorization(activity, category, isTracked, user)}}/>
               </div> 
             : <div>&nbsp;<br/></div>}
-            {/* {activity.productivity.source === 'ml' ? (
-          <button onClick={() => {affirmCategorization(activity, category, isTracked, user)}}>✔️
-          </button>) : null} */}
           </div>
-          
-          
 
-          {/* <button onClick={() => {deleteActivity(activity, category, isTracked, user)}}>🗑️</button> */}
-            
         </Paper>
       </div>
     )
+  }
 }
 
 ActivityCard.propTypes = {
   activity: (props, propName, componentName) => {
     if (typeof props.activity.productivity !== 'object') {
-      console.log('custom error incoming for activity', props.activity)
       return new Error(`
         Required prop "productivity" was not an object, instead it was ${props.activity.productivity}
       `)
@@ -161,3 +125,20 @@ ActivityCard.propTypes = {
 };
 
 export default DragSource(ItemTypes.CARD, cardSource, collect)(ActivityCard);
+
+
+const coreStyle = {
+  font: 'Roboto', 
+  padding: '10px 15px 15px 5px',
+  margin: '0px 8x 0px 8px',
+  textAlign: 'left',
+  background: 'white',
+  color: 'black',
+  fontSize: '80%',
+};
+
+const colorMap = {
+  'productive': {tick: '#DCEDC8', tock: '#C5E1A5' },
+  'neutral': {tick: '#FFF9C4', tock: '#FFF59D' },
+  'distracting': {tick: '#FFCCBC', tock: '#FFAB91'}
+}

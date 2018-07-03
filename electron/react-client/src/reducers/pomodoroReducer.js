@@ -6,7 +6,7 @@ const timestamp = () => {
 }
 
 const initialState = {
-  pomStartTime: null, // consider actual usefulness of this
+  pomStartTime: null,
   status: 'not started',
   currentSpurt: {
     type: null,
@@ -17,7 +17,7 @@ const initialState = {
     shortBreak: 0,
     longBreak: 0
   },
-  elapsedTimeFromCompletedSpurts: 0, //i.e. not from current spurt, which only React knows about
+  elapsedTimeFromCompletedSpurts: 0,
   prefs : {
     workLength: 1000 * 60 * 25,
     shortBreakLength: 1000 * 60 * 5,

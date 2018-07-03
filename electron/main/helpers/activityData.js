@@ -8,9 +8,11 @@ const chalk = require('chalk');
 const path = require('path');
 const url = require('url');
 
-const { serverURL } = require(path.join(__dirname, '../config.js'));
+const config = require(path.join(__dirname, '../mainConfig.js'));
+const serverURL = process.env.NODE_ENV === 'localhost' ? config.localhost : config.server;
+console.log('server url is', serverURL);
 
-const monitorActivity = (activities, user) => {
+const monitorActivity = (activities, user, jwt) => {
   return activeWin()
     .then((data) => {
       let newActivity = assembleActivity(data);
@@ -28,14 +30,16 @@ const monitorActivity = (activities, user) => {
           user_name: user,
           app_name: lastActivity.app,
           window_title: lastActivity.title
-        }
-        return axios.get(serverURL + '/api/classifications', {params: qs})
+        };
+        const headers = {
+          Authorization: `${user} ${jwt}`
+        };
+        console.log('headers in activity monitor are', headers);
+        return axios.get(serverURL + '/api/classifications', {headers, params: qs})
           .then((resp) => {
             if (typeof resp.data !== 'object') {
               console.log(chalk.blue('RECEIVED PROD OBJ FROM SERVER THAT IS NOT OBJECT!'));
               console.log('received this instead', resp.data)
-            } else {
-              console.log('server response to looking up categorization', resp.data);
             }
             return {
               ...lastActivity,
@@ -62,7 +66,8 @@ const assembleActivity = (activeWinObj) => {
     id: activeWinObj.id,
     app,
     title, 
-    startTime: timestamp()
+    startTime: timestamp(),
+    toShow: 1 //sqlite3 does not support booleans, use 0 and 1 instead
   };
 };
 
@@ -105,7 +110,7 @@ const sanitizeTitle = (title) => {
     'Stack Overflow': 'Stack Overflow',
     'JSFiddle': 'JSFiddle'
   }
-  if(titlesObj[title]) return titlesObj[title];
+  if (titlesObj[title]) return titlesObj[title];
 
   if (title.startsWith('http') || title.startsWith('www.')) {
     console.log(`turning ${title} into ${getDomainName(title)}`)
@@ -130,9 +135,9 @@ const chunkComplete = (lastActivity, newActivity) => {
   return (lastActivity.app !== newActivity.app) || (lastActivity.title !== newActivity.title);
 };
 
-const startMonitor = (mainWindow, activities = [], user = "test") => {
+const startMonitor = (mainWindow, activities = [], user, jwt) => {
   return setInterval(() => {
-    monitorActivity(activities, user)
+    monitorActivity(activities, user, jwt)
       .then((data) => {
         if (data) {
           mainWindow.sender.webContents.send('activity', data)
@@ -147,16 +152,20 @@ const startMonitor = (mainWindow, activities = [], user = "test") => {
 let intervalId = false;
 let activities = [];
 let user = '';
+let jwt = '';
 
 exports.monitor = (mainWindow, mainSession) => {
   ipcMain.on('monitor', (mainWindow, event, message) => {
     if (event === 'start') {
-      user = message;
+      console.log('start message is', message)
+      const userObj = JSON.parse(message);
+      user = userObj.user;
+      jwt = userObj.jwt;
       activities = [];
-      intervalId = startMonitor(mainWindow, activities, message);
+      intervalId = startMonitor(mainWindow, activities, user, jwt);
     } else if (event === 'pause' && intervalId) {
       clearInterval(intervalId);
-      monitorActivity(activities, user); // ♫ ♬ ONE LAST/MORE TIME ♩ ♬ 
+      monitorActivity(activities, user, jwt); // ♫ ♬ ONE LAST/MORE TIME ♩ ♬ 
       intervalId = false;
     } else {
       console.error('activity monitor did not understand instruction', event, message);
@@ -169,11 +178,5 @@ exports.stopMonitorProcess = () => {
 };
 
 exports.restartMonitorProcess = (mainWindow, mainSession) => {
-  intervalId = startMonitor(mainWindow, activities, user);
-}
-
-/*
-ideas for tests:
-make sure chunks are properly assembled by making sure it's not making a new chunk every second
-make sure entire time period is covered by chunks
-*/
+  intervalId = startMonitor(mainWindow, activities, user, jwt);
+};

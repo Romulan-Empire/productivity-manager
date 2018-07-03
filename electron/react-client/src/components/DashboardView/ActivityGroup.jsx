@@ -17,7 +17,6 @@ const comparisonTarget = {
     const newCategory = props.category;
     const wasML = activity.productivity.source === 'ml';
     const user = props.user
-    // console.log('activity being moved is', activity);
     props.changeCategory(activity, oldCategory, newCategory, isTracked, user, wasML);
   }
 };
@@ -40,7 +39,8 @@ const ActivityGroup = props => {
     style,
     preferences,
     user,
-    affirmCategorization
+    affirmCategorization,
+    toggleActivityView
   } = props;
   const sortedActivities = [...activities].sort(
     (a, b) => b.duration - a.duration
@@ -66,6 +66,8 @@ const ActivityGroup = props => {
           >
             <br/>
             {getTotalDuration(activities)}
+            <div onClick={() => toggleActivityView(0, category)}>Clear</div>
+            <div onClick={() => toggleActivityView(1, category)}>Show All</div>
           </span>
         </Paper>  
                                 
@@ -96,7 +98,6 @@ const ActivityGroup = props => {
               textAlign: "center",
               color: "white",
               fontWeight: "bolder",
-              // fontSize: "115%",
               onMouseOver: "#FFF",
               borderRadius: "0px 0px 15px 15px"
             }
@@ -130,7 +131,7 @@ const getTotalDuration = activities => {
   });
   let formatDuration = moment
     .duration(duration, "seconds")
-    .format("h[h], m[m] s[s]");
+    .format("h[h] m[m] s[s]");
   return formatDuration;
 };
 
