@@ -5,10 +5,11 @@
   "main": "main/index.js",
   "scripts": {
     "start": "electron main/index.js",
+    "local-electron-dev": "NODE_ENV=localhost electron main/index.js",
     "rebuild": "npm install electron-rebuild",
     "rebuildDB": "./node_modules/.bin/electron-rebuild -w sqlite3 -p",
-    "package": "electron-forge package main/index.js",
-    "make": "electron-forge make main/index.js"
+    "package": "NODE_ENV=production electron-forge package main/index.js",
+    "make": "NODE_ENV=production electron-forge make main/index.js"
   },
   "repository": {
     "type": "git",

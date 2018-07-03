@@ -19,7 +19,6 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       tabIndex: 0
     }
@@ -31,10 +30,6 @@ class App extends React.Component {
     this.setState({
       tabIndex: tabIndex
     })
-  }
-
-  componentDidMount() {
-    // console.log('app component got this user_id via props', this.props.user);
   }
   
   render() {
@@ -73,14 +68,6 @@ class App extends React.Component {
       </Paper>
     </MuiThemeProvider>
     )
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    saveUserToStore: (user) => {
-      dispatch(getUser(user))
-    }
   }
 }
 

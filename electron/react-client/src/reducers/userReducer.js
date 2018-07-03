@@ -1,7 +1,8 @@
-import { SET_USER, GET_USER, SET_TOKEN, GET_TOKEN } from '../actions/types';
+import { SET_USER, GET_USER, SET_TOKEN, GET_TOKEN, SET_JWT } from '../actions/types';
 
 const initialState = {
   user: '',
+  jwt: '',
   token: ''
 };
 
@@ -13,10 +14,14 @@ const user = (state = initialState, action) => {
         user: action.payload
       }
     case SET_TOKEN:
-      // console.log('in reducer, about to set user to', action.payload)
       return {
         ...state,
         token: action.payload
+      }
+    case SET_JWT:
+      return {
+        ...state,
+        jwt: action.payload
       }
     case GET_TOKEN:
       return state.token;

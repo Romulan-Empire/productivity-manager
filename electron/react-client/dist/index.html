@@ -3,7 +3,7 @@
 <head>
   <title>Thyme.ly</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/5.0.2/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
 </head>
 </head>
 <body>
@@ -13,7 +13,8 @@
     
     <div class="form">
       <img src="./leaf-icon.png" id="leaf-icon">
-      <h2>Thyme.ly</h2>
+      <h1>Thyme.ly</h1>
+      <h4>Because there's no time like the present</h4>
       <form class="register-form">
         <input type="text" id="reg-name" placeholder="name"/>
         <input type="text" id="reg-email" placeholder="email address"/>
@@ -25,13 +26,12 @@
         <input type="text" id="email" placeholder="email address"/>
         <input type="password" id="password" placeholder="password"/>
         <button type="button" id="login">login</button>
-        <button id="google" type="button" style="padding:none; background:none;"><img src="./signin.png" style="max-width:70%; padding-top:3%;"></button>
         <p class="message" style="text-align:center;">Not registered? <a href="#">Create an account</a></p>
       </form>
     </div>
     </div>
   <script>
-    require('../src/index.jsx')
+    require('../src/login.js')
   </script>
 </body>
 </html>

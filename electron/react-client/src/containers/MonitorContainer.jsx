@@ -16,8 +16,8 @@ import SendIcon from 'material-ui/svg-icons/content/send';
 import Snackbar from 'material-ui/Snackbar';
 
 import { addActivity, patchActivity, setAllActivities } from '../actions/activityActions.js';
-import { setUser, setToken } from '../actions/userActions.js';
-import { listEvents } from '../index.jsx'
+import { setUser, setToken, setJWT } from '../actions/userActions.js';
+// import { listEvents } from '../index.jsx';
 import { startMonitor, pauseMonitor, toggleMonitor } from '../actions/monitorActions.js';
 
 class MonitorContainer extends React.Component {
@@ -29,7 +29,6 @@ class MonitorContainer extends React.Component {
     }
 
     this.checkState = this.checkState.bind(this);
-    // this.toggleTimerButton = this.toggleTimerButton.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handlePlayButtonChange = this.handlePlayButtonChange.bind(this);
     this.logout = this.logout.bind(this);
@@ -55,20 +54,24 @@ class MonitorContainer extends React.Component {
     });
 
     ipcRenderer.on('system', (event, message) => {
-      // console.log('got system message of', message)
       if (message === 'sleep') {
         this.props.pauseMonitor();
       }
       else if (message === 'resume') {
-        this.props.startMonitor(this.props.user.user)
+        this.props.startMonitor(this.props.user.user, this.props.user.jwt);
       };
     });
 
     ipcRenderer.send('cookies', 'check');
 
     ipcRenderer.on('cookies', (event, message) => {
-      this.props.setUser(message.value);
-      if (message.value) this.props.startMonitor(message.value);
+      console.log('cookies message inside monitor container is', message);
+      console.log('parsed message is', JSON.parse(message.value))
+      console.log('user is', JSON.parse(message.value).user)
+      const {user, jwt} = JSON.parse(message.value);
+      this.props.setUser(user);
+      this.props.setJWT(jwt);
+      if (message.value) this.props.startMonitor(user, jwt);
     });
 
     ipcRenderer.send('token', 'check');
@@ -101,21 +104,10 @@ class MonitorContainer extends React.Component {
     if (this.props.monitor.running) {
       this.props.pauseMonitor();
     } else {
-      this.props.startMonitor();
+      const {user, jwt} = this.props.user;
+      this.props.startMonitor(user, jwt);
     }
   }
-
-  // toggleTimerButton() { //call this.props.pauseMonitor or this.props.startMonitor depending on current this.props.monitor.running
-  //   let toggle = !this.state.showTimerButton;
-  //   this.setState({
-  //     showTimerButton: toggle
-  //   });
-  //   if (!toggle) {
-  //     this.pauseMonitor();
-  //   } else {
-  //     this.connectMonitor(this.props.user.user);
-  //   }
-  // }
 
   checkState (data, isTracked) {
     for (let category in this.props.activities) {
@@ -138,9 +130,7 @@ class MonitorContainer extends React.Component {
 
   render() {
     return (
-      // TODO: Make this component render a Pause/Start timer button
       <Paper zDepth={2} style={bottomBarStyle}>
-        {/* <button onClick={this.logout}>Test logout button</button> */}
         <FlatButton 
           label="Logout & Quit" 
           hoverColor="#64B5F6"
@@ -148,10 +138,6 @@ class MonitorContainer extends React.Component {
           style={{position: 'relative', top: '8px', marginLeft: '10px'}}
           labelStyle={{font: 'Tahoma', color: 'white', fontWeight: 'bold'}}
         />
-        {/* IS MONITOR RUNNING? {JSON.stringify(this.props.monitor.running)}
-        <button onClick={this.props.pauseMonitor}>Test pause button</button>
-        <button onClick={() => this.props.startMonitor(this.props.user.user)}>Test start button</button> */}
-        {/* <pre>'current user is' {JSON.stringify(this.props.user)}</pre> */}
         
         <RaisedButton 
           label={this.props.monitor.running ? "Pause" : "Play"}
@@ -204,14 +190,17 @@ const mapDispatchToProps = dispatch => {
     setToken: (token) => {
       dispatch(setToken(token))
     },
-    startMonitor: (user) => {
-      dispatch(startMonitor(user))
+    setJWT: (jwt) => {
+      dispatch(setJWT(jwt))
+    },
+    startMonitor: (user, jwt) => {
+      dispatch(startMonitor(user, jwt))
     },
     pauseMonitor: () => {
       dispatch(pauseMonitor())
     }, 
     toggleMonitor: () => {
-      dispatch(toggleMonitor());
+      dispatch(toggleMonitor(user, jwt));
     } 
   };
 }

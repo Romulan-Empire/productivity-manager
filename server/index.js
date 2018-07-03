@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000;
 const moment = require('moment');
 const chalk = require('chalk');
 
+const auth = require('./utils/auth.js');
 const db = require('./database/index.js');
 const scrapeDb = require('./database/scraper.js');
 const ml = require('./learn/naiveBayes.js');
@@ -15,34 +16,42 @@ ml.initClassifier();
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, './splash-client/dist')));
-//middleware
 
 app.use((req, res, next) => {
   res.header(`Access-Control-Allow-Origin`, `*`);
-  res.header(`Access-Control-Allow-Headers`, `Origin, X-Requested-With, Content-Type, Accept`);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header(`Access-Control-Allow-Headers`, `Origin, X-Requested-With, Content-Type, Accept, Authorization`);
   next();
 });
 
-app.use('/api/classifications', (req, res, next) => {
-  //TODO: ADD JSON TOKEN VERIFICATION
-  next();
+const admin = require('firebase-admin');
+const serviceAccount = require('./firebaseConfig.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://thymely-cd776.firebaseio.com'
 });
 
-//api
-app.get('/api/classifications', async (req, res) => {
-  //MAIN FILE NEEDS ACCESS TO 'IS TRACKED'
+app.post('/session', (req, res) => {
+  const idToken = req.body.idToken.toString();
+  admin.auth().verifyIdToken(idToken)
+    .then((decodedToken) => {
+      const uid = decodedToken.uid;
+      const token = auth.createToken(uid);
+      res.send({uid, token})
+    })
+    .catch((error) => {
+      res.status(401).send('UNAUTHORIZED REQUEST!');
+    });
+});
+
+app.get('/api/classifications', auth.checkJWT, async (req, res) => {
   const {user_name, app_name, window_title} = req.query;
-  if (!user_name) { //refactor to be middleware
-    console.log(chalk.blue('NO USER NAME!'))
-    console.log('req.query is', req.query)
-    res.send('no user attached to this session')
-  }
 
   try {
     const prod_class = await db.getProductivityClass(app_name, window_title, user_name);
-    if (prod_class === null && app_name === 'Google Chrome') { //add other tracked app
+    if (prod_class === null && app_name === 'Google Chrome') { 
       const predictedProdClass = ml.predictProductivityClass(window_title, user_name)
-      console.log('predicted prod is', predictedProdClass);
       res.send({
         source: predictedProdClass ? 'ml' : 'user',
         class: ml.predictProductivityClass(window_title, user_name)
@@ -61,14 +70,9 @@ app.get('/api/classifications', async (req, res) => {
   }
 });
 
-app.post('/api/classifications', async (req, res) => {
-  if (!req.body.params.user_name) {
-    console.log('req.body.params is', req.body.params)
-    console.log(chalk.blue('NO USER NAME!'))
-    res.send('no user attached to this session')
-  }
-
+app.post('/api/classifications', auth.checkJWT, async (req, res) => {
   const result = await db.addOrChangeProductivity(req.body.params);
+
   try {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
@@ -80,10 +84,8 @@ app.post('/api/classifications', async (req, res) => {
       learnProductivityClass(window_title, prod_class)
     }
     if (req.body.params.ml === 'affirm') {
-      console.log('log this as a ml win!');
       db.updateMachineLearningLog('affirm');
     } else if (req.body.params.wasML) {
-      console.log('bad ml!');
       db.updateMachineLearningLog('reject');
     }
   } catch(e) {
@@ -92,14 +94,9 @@ app.post('/api/classifications', async (req, res) => {
   }
 });
 
-app.delete('/api/classifications', async (req, res) => {
-  console.log(chalk.blue('getting a delete request for', JSON.stringify(req.body)));
-  if (!req.body.user_name) {
-    console.log(chalk.blue('NO USER NAME!'))
-    res.send('no user attached to this session')
-  }
-
+app.delete('/api/classifications', auth.checkJWT, async (req, res) => {
   const result = await db.deleteProductivityClass(req.body);
+  
   try {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
@@ -113,8 +110,6 @@ app.delete('/api/classifications', async (req, res) => {
   }
 });
 
-let server = app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
-
-

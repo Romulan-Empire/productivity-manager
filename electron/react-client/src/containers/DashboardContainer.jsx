@@ -1,8 +1,5 @@
 import { connect } from 'react-redux';
-import ReactDOM from 'react-dom';
 import React from 'react';
-import { ipcRenderer } from 'electron';
-import axios from 'axios';
 
 import { changeCategory, deleteActivity, affirmCategorization } from '../actions/activityActions'
 import ProductivityScore from './ProductivityScore.jsx';
@@ -27,7 +24,7 @@ class DashboardContainer extends React.Component {
             changeCategory={changeCategory}
             deleteActivity={deleteActivity}
             preferences={preferences}
-            user={user.user}
+            user={user}
             affirmCategorization={affirmCategorization}
           />
           <ActivityGroup
@@ -36,7 +33,7 @@ class DashboardContainer extends React.Component {
             changeCategory={changeCategory}
             deleteActivity={deleteActivity}
             preferences={preferences}
-            user={user.user}
+            user={user}
             affirmCategorization={affirmCategorization}
           />
           <ActivityGroup
@@ -45,7 +42,7 @@ class DashboardContainer extends React.Component {
             changeCategory={changeCategory}
             deleteActivity={deleteActivity}
             preferences={preferences}
-            user={user.user}
+            user={user}
             affirmCategorization={affirmCategorization}
           />
         </Paper>

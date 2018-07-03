@@ -21,9 +21,9 @@ const formatMSToMS = (ms) => {
 class PomodoroContainer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { //local state, everything else is in the store
+    this.state = {
       timerIntervalId: null,
-      lastCheckedTime: null, //used to compare to current time to increment elapsed time
+      lastCheckedTime: null,
       elapsedTime: 0,
       lastRerender: null,
     }
@@ -33,12 +33,12 @@ class PomodoroContainer extends React.Component {
     this.pauseTimer = this.pauseTimer.bind(this);
     this.resumeTimer = this.resumeTimer.bind(this);
     this.clearTimer = this.clearTimer.bind(this);
-    this.skipAhead = this.skipAhead.bind(this); //for testing only?
+    this.skipAhead = this.skipAhead.bind(this);
   }
 
   trackTime() {
     if (this.state.elapsedTime >= this.props.pomodoro.currentSpurt.length ||
-    (this.props.pomodoro.currentSpurt.length - this.state.elapsedTime) < 20) { //must be better way to smooth out
+    (this.props.pomodoro.currentSpurt.length - this.state.elapsedTime) < 20) {
       this.setState({
         lastCheckedTime: Date.now(),
         elapsedTime: 0
@@ -109,9 +109,6 @@ class PomodoroContainer extends React.Component {
     const totalGoalLength = calculateTotalGoalLength(pomodoro.prefs); 
     const totalDayData = [{name: 'total elapsed time', value: this.state.elapsedTime + completedSpurtLength},
                           {name: 'total time remaining', value: totalGoalLength - this.state.elapsedTime - completedSpurtLength}]
-    // console.log('total time remaining:', totalGoalLength - this.state.elapsedTime - completedSpurtLength)
-    // console.log('completed spurt length', completedSpurtLength)          
-    // console.log('local state elapsed time', this.state.elapsedTime)
 
     return (
       <div style={{textAlign: 'center'}}>
@@ -151,7 +148,6 @@ class PomodoroContainer extends React.Component {
             {pomodoro.status === 'not started' 
               ? null 
               : <RaisedButton style={containerStyle} buttonStyle={buttonStyle} onClick={this.clearTimer}>Clear</RaisedButton>}
-            {/* last button is duplicative of the first logically, but this spaces out the buttons better */}
             <RaisedButton style={containerStyle} buttonStyle={buttonStyle} onClick={this.skipAhead}>Complete</RaisedButton>
         </div>
         </Paper>
@@ -218,7 +214,6 @@ const containerStyle = {
 }
 
 const buttonStyle = {
-  // padding: '8px',
   background: '#90A4AE'
 }
 
