@@ -44,10 +44,9 @@ const renderApp = (uId, jwtToken) => {
   document.getElementById('login-page').innerHTML = '';
 };
 
-loginButton.addEventListener('click', () => {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  auth.signInWithEmailAndPassword(email, password)
+const handleClick = (authType, elements) => {
+  const {email, password} = elements;
+  auth[authType](email.value, password.value)
     .then((data) => {
       return getJWT(data.user);
     })
@@ -56,26 +55,24 @@ loginButton.addEventListener('click', () => {
     })
     .catch((err) => {
       alert(`Error: ${err.message}`);
-      document.getElementById('email').value = '';
-      document.getElementById('password').value = '';
+      email.value = '';
+      password.value = '';
     });
+};
+
+loginButton.addEventListener('click', () => {
+  const elements = {
+    email: document.getElementById('email'),
+    password: document.getElementById('password')
+  };
+  handleClick('signInWithEmailAndPassword', elements);
 });
 
 registerButton.addEventListener('click', () => {
-  const name = document.getElementById('reg-name').value;
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((data) => {
-      return getJWT(data.user);
-    })
-    .then((resp) => {
-      renderApp(resp.data.uid, resp.data.token);
-    })
-    .catch((err) => {
-      alert(`Error: ${err.message}`);
-      document.getElementById('email').value = '';
-      document.getElementById('password').value = '';
-    });
+  const elements = {
+    email: document.getElementById('reg-email'),
+    password: document.getElementById('reg-password')
+  };
+  handleClick('createUserWithEmailAndPassword', elements);
 });
 
