@@ -9,6 +9,7 @@ const path = require('path');
 const url = require('url');
 
 const config = require(path.join(__dirname, '../mainConfig.js'));
+const sanitizers = require('./activitySanitizers.js');
 const serverURL = process.env.NODE_ENV === 'localhost' ? config.localhost : config.server;
 console.log('server url is', serverURL);
 
@@ -34,7 +35,6 @@ const monitorActivity = (activities, user, jwt) => {
         const headers = {
           Authorization: `${user} ${jwt}`
         };
-        console.log('headers in activity monitor are', headers);
         return axios.get(serverURL + '/api/classifications', {headers, params: qs})
           .then((resp) => {
             if (typeof resp.data !== 'object') {
@@ -60,7 +60,7 @@ const timestamp = () => {
 
 const assembleActivity = (activeWinObj) => {
   const app = activeWinObj.owner.name
-  let title = stripEmoji(activeWinObj.title); // filter out the sound playing emoji
+  let title = sanitizers.stripEmoji(activeWinObj.title); // filter out the sound playing emoji
   title = (app === "Google Chrome") ? sanitizeTitle(title) : title
   return {
     id: activeWinObj.id,
@@ -69,14 +69,6 @@ const assembleActivity = (activeWinObj) => {
     startTime: timestamp()
   };
 };
-
-const stripEmoji = (title) => {
-  const indexOfEmoji = title.indexOf('🔊'); //indicates a window is playing sound
-  if (indexOfEmoji > -1) {
-    const noEmoji = title.replace('🔊', '');
-    return noEmoji.substring(0, noEmoji.length - 1);
-  } else return title;
-}
 
 const getDomainName = (url) => {
   const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im)

@@ -7,7 +7,7 @@ const electron = require('electron');
 const { app, BrowserWindow, Menu, ipcMain, Tray, nativeImage, session } = electron;
 
 const { saveStoreToSql, populateStore } = require('./helpers/sqlHelpers.js')
-const { monitor } = require('./helpers/activityData.js');
+const { monitor } = require('./helpers/activityMonitor.js');
 const { manageCookies, manageToken } = require('./helpers/manageSession.js');
 
 let mainWindow, popUpWindow, tray, splash;
