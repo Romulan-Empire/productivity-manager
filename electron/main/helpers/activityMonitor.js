@@ -1,7 +1,7 @@
 //file to get sample data chunks
 const activeWin = require('active-win');
 const moment = require('moment');
-const electron = require('electron')
+const electron = require('electron');
 const { ipcMain, session } = electron;
 const axios = require('axios');
 const chalk = require('chalk');
@@ -9,6 +9,7 @@ const path = require('path');
 const url = require('url');
 
 const config = require(path.join(__dirname, '../mainConfig.js'));
+const sanitizers = require('./activitySanitizers.js');
 const serverURL = process.env.NODE_ENV === 'localhost' ? config.localhost : config.server;
 console.log('server url is', serverURL);
 
@@ -34,7 +35,6 @@ const monitorActivity = (activities, user, jwt) => {
         const headers = {
           Authorization: `${user} ${jwt}`
         };
-        console.log('headers in activity monitor are', headers);
         return axios.get(serverURL + '/api/classifications', {headers, params: qs})
           .then((resp) => {
             if (typeof resp.data !== 'object') {
@@ -60,8 +60,8 @@ const timestamp = () => {
 
 const assembleActivity = (activeWinObj) => {
   const app = activeWinObj.owner.name
-  let title = stripEmoji(activeWinObj.title); // filter out the sound playing emoji
-  title = (app === "Google Chrome") ? sanitizeTitle(title) : title
+  let title = sanitizers.stripEmoji(activeWinObj.title); // filter out the sound playing emoji
+  title = (app === "Google Chrome") ? sanitizers.sanitizeTitle(title) : title
   return {
     id: activeWinObj.id,
     app,
@@ -69,61 +69,6 @@ const assembleActivity = (activeWinObj) => {
     startTime: timestamp()
   };
 };
-
-const stripEmoji = (title) => {
-  const indexOfEmoji = title.indexOf('🔊'); //indicates a window is playing sound
-  if (indexOfEmoji > -1) {
-    const noEmoji = title.replace('🔊', '');
-    return noEmoji.substring(0, noEmoji.length - 1);
-  } else return title;
-}
-
-const getDomainName = (url) => {
-  const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im)
-  if (match) {
-    const result = match[1]
-    const secondMatch = result.match(/^[^\.]+\.(.+\..+)$/)
-    if (secondMatch) {
-        return secondMatch[1]
-    }
-    return result
-  }
-  return url
-}
-
-const sanitizeTitle = (title) => {
-
-  let titlesObj = {
-    '': ' ',
-    'New Tab': ' ',
-    'Home': ' ',
-    'Forwarding...': ' ',
-    'Untitled': ' ',
-    'Member privileges': ' ',
-    'Notification settings': ' ',
-    'Google Accounts': ' ',
-    'Google Search': ' ',
-    'Untitled': ' ',
-    'Gmail': 'Gmail',
-    'Google Calendar': 'Google Calendar',
-    'Stack Overflow': 'Stack Overflow',
-    'JSFiddle': 'JSFiddle'
-  }
-  if (titlesObj[title]) return titlesObj[title];
-
-  if (title.startsWith('http') || title.startsWith('www.')) {
-    console.log(`turning ${title} into ${getDomainName(title)}`)
-    return getDomainName(title);
-  }
-
-  let name = title.split('-').reverse()[0].trim()
-  if (titlesObj[name]) return titlesObj[name];
-
-  name = title.split('-')[0].trim();
-  if (titlesObj[name]) return titlesObj[name];
-
-  return title;
-}
 
 const needToInitializeChunk = (lastActivity) => {
   return !lastActivity;

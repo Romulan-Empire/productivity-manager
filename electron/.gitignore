@@ -4,8 +4,8 @@ node_modules
 react-client/.DS_Store
 react-client/dist/bundle.js
 package-lock.json
-react-client/config.js
-main/config.js
+react-client/reactConfig.js
+main/mainConfig.js
 config.js
 out
 database/sqlite.db
