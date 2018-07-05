@@ -1,7 +1,7 @@
 //file to get sample data chunks
 const activeWin = require('active-win');
 const moment = require('moment');
-const electron = require('electron')
+const electron = require('electron');
 const { ipcMain, session } = electron;
 const axios = require('axios');
 const chalk = require('chalk');
@@ -61,7 +61,7 @@ const timestamp = () => {
 const assembleActivity = (activeWinObj) => {
   const app = activeWinObj.owner.name
   let title = sanitizers.stripEmoji(activeWinObj.title); // filter out the sound playing emoji
-  title = (app === "Google Chrome") ? sanitizeTitle(title) : title
+  title = (app === "Google Chrome") ? sanitizers.sanitizeTitle(title) : title
   return {
     id: activeWinObj.id,
     app,
@@ -69,53 +69,6 @@ const assembleActivity = (activeWinObj) => {
     startTime: timestamp()
   };
 };
-
-const getDomainName = (url) => {
-  const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im)
-  if (match) {
-    const result = match[1]
-    const secondMatch = result.match(/^[^\.]+\.(.+\..+)$/)
-    if (secondMatch) {
-        return secondMatch[1]
-    }
-    return result
-  }
-  return url
-}
-
-const sanitizeTitle = (title) => {
-
-  let titlesObj = {
-    '': ' ',
-    'New Tab': ' ',
-    'Home': ' ',
-    'Forwarding...': ' ',
-    'Untitled': ' ',
-    'Member privileges': ' ',
-    'Notification settings': ' ',
-    'Google Accounts': ' ',
-    'Google Search': ' ',
-    'Untitled': ' ',
-    'Gmail': 'Gmail',
-    'Google Calendar': 'Google Calendar',
-    'Stack Overflow': 'Stack Overflow',
-    'JSFiddle': 'JSFiddle'
-  }
-  if (titlesObj[title]) return titlesObj[title];
-
-  if (title.startsWith('http') || title.startsWith('www.')) {
-    console.log(`turning ${title} into ${getDomainName(title)}`)
-    return getDomainName(title);
-  }
-
-  let name = title.split('-').reverse()[0].trim()
-  if (titlesObj[name]) return titlesObj[name];
-
-  name = title.split('-')[0].trim();
-  if (titlesObj[name]) return titlesObj[name];
-
-  return title;
-}
 
 const needToInitializeChunk = (lastActivity) => {
   return !lastActivity;

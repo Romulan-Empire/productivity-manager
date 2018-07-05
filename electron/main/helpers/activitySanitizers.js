@@ -1,4 +1,4 @@
-exports.stripEmoji = (title) => {
+const stripEmoji = (title) => {
   const indexOfEmoji = title.indexOf('🔊'); //indicates a window is playing sound
   if (indexOfEmoji > -1) {
     const noEmoji = title.replace('🔊', '');
@@ -6,7 +6,7 @@ exports.stripEmoji = (title) => {
   } else return title;
 };
 
-exports.getDomainName = (url) => {
+const getDomainName = (url) => {
   const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im)
   if (match) {
     const result = match[1]
@@ -19,7 +19,7 @@ exports.getDomainName = (url) => {
   return url
 };
 
-exports.sanitizeTitle = (title) => {
+const sanitizeTitle = (title) => {
 
   let titlesObj = {
     '': ' ',
@@ -52,3 +52,7 @@ exports.sanitizeTitle = (title) => {
 
   return title;
 }
+
+exports.stripEmoji = stripEmoji;
+exports.getDomainName = getDomainName;
+exports.sanitizeTitle = sanitizeTitle;
