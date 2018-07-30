@@ -16,6 +16,7 @@ console.log('server url is', serverURL);
 const monitorActivity = (activities, user, jwt) => {
   return activeWin()
     .then((data) => {
+      console.log('activeWin data is', JSON.stringify(data))
       let newActivity = assembleActivity(data);
       let lastActivity = activities[activities.length - 1];
       if (needToInitializeChunk(lastActivity)) activities.push(newActivity);
@@ -124,3 +125,8 @@ exports.stopMonitorProcess = () => {
 exports.restartMonitorProcess = (mainWindow, mainSession) => {
   intervalId = startMonitor(mainWindow, activities, user, jwt);
 };
+
+// exports for unit tests
+
+exports.assembleActivity = assembleActivity;
+exports.chunkComplete = chunkComplete;
