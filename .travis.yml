@@ -12,7 +12,7 @@ addons:
       - g++-4.8
 before_script:
   - npm i -g npm
-  - cd electron && npm install
+  - cd electron && npm install && cd ..
 cache:
   directories:
     - "electron/node_modules"
