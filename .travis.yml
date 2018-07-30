@@ -1,6 +1,6 @@
 language: node.js
 node_js:
-  - "10"
+  - "7.9.0"
 env:
   - CXX=g++-4.8
 addons:
@@ -10,6 +10,7 @@ addons:
     packages:
       - g++-4.8
 before_script:
+  - npm i -g npm
   - cd electron && npm install
 cache:
   directories:
