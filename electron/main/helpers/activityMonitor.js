@@ -13,6 +13,32 @@ const sanitizers = require('./activitySanitizers.js');
 const serverURL = process.env.NODE_ENV === 'localhost' ? config.localhost : config.server;
 console.log('server url is', serverURL);
 
+
+const timestamp = () => {
+  return moment().format('MMMM Do YYYY, h:mm:ss a');
+};
+
+const assembleActivity = (activeWinObj) => {
+  const app = activeWinObj.owner.name
+  let title = sanitizers.stripEmoji(activeWinObj.title); // filter out the sound playing emoji
+  title = (app === "Google Chrome") ? sanitizers.sanitizeTitle(title) : title
+  return {
+    id: activeWinObj.id,
+    app,
+    title, 
+    startTime: timestamp()
+  };
+};
+
+const needToInitializeChunk = (lastActivity) => {
+  return !lastActivity;
+};
+
+const chunkComplete = (lastActivity, newActivity) => {
+  if (needToInitializeChunk(lastActivity)) return false;
+  return (lastActivity.app !== newActivity.app) || (lastActivity.title !== newActivity.title);
+};
+
 const monitorActivity = (activities, user, jwt) => {
   return activeWin()
     .then((data) => {
@@ -54,31 +80,6 @@ const monitorActivity = (activities, user, jwt) => {
     })
 };
 
-const timestamp = () => {
-  return moment().format('MMMM Do YYYY, h:mm:ss a');
-};
-
-const assembleActivity = (activeWinObj) => {
-  const app = activeWinObj.owner.name
-  let title = sanitizers.stripEmoji(activeWinObj.title); // filter out the sound playing emoji
-  title = (app === "Google Chrome") ? sanitizers.sanitizeTitle(title) : title
-  return {
-    id: activeWinObj.id,
-    app,
-    title, 
-    startTime: timestamp()
-  };
-};
-
-const needToInitializeChunk = (lastActivity) => {
-  return !lastActivity;
-};
-
-const chunkComplete = (lastActivity, newActivity) => {
-  if (needToInitializeChunk(lastActivity)) return false;
-  return (lastActivity.app !== newActivity.app) || (lastActivity.title !== newActivity.title);
-};
-
 const startMonitor = (mainWindow, activities = [], user, jwt) => {
   return setInterval(() => {
     monitorActivity(activities, user, jwt)
@@ -89,7 +90,7 @@ const startMonitor = (mainWindow, activities = [], user, jwt) => {
       })
       .catch((err) => console.error('error in activity monitor', err))
   }, 1000)
-}
+};
 
 //closure variables
 
@@ -124,3 +125,8 @@ exports.stopMonitorProcess = () => {
 exports.restartMonitorProcess = (mainWindow, mainSession) => {
   intervalId = startMonitor(mainWindow, activities, user, jwt);
 };
+
+// exports for unit tests
+
+exports.assembleActivity = assembleActivity;
+exports.chunkComplete = chunkComplete;

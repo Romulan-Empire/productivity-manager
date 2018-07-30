@@ -9,7 +9,8 @@
     "rebuild": "npm install electron-rebuild",
     "rebuildDB": "./node_modules/.bin/electron-rebuild -w sqlite3 -p",
     "package": "NODE_ENV=production electron-forge package main/index.js",
-    "make": "NODE_ENV=production electron-forge make main/index.js"
+    "make": "NODE_ENV=production electron-forge make main/index.js",
+    "test": "mocha $(find spec -name '*.spec.js')"
   },
   "repository": {
     "type": "git",
@@ -75,7 +76,8 @@
     "electron-forge": "^5.2.2",
     "electron-mocha": "6.0.2",
     "electron-prebuilt-compile": "2.0.0",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "spectron": "^3.8.0"
   },
   "dependencies": {
     "active-win": "^3.0.0",
