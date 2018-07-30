@@ -1,0 +1,16 @@
+language: node.js
+node_js:
+  - "10"
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+before_script:
+  - cd electron && npm install
+cache:
+  directories:
+    - "electron/node_modules"
