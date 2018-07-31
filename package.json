@@ -7,7 +7,7 @@
     "server-dev": "cd server && npm run dev",
     "local-electron-dev": "NODE_ENV=localhost npm run electron-dev",
     "mock-production-electron-dev": "NODE_ENV=production npm run electron-dev",
-    "test": "mocha $(find electron/spec -name '*.spec.js')"
+    "test": "cd electron && mocha $(find spec -name '*.spec.js')"
   },
   "repository": {
     "type": "git",

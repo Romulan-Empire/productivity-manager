@@ -10,9 +10,7 @@ const chalk = require('chalk');
 const auth = require('./utils/auth.js');
 const db = require('./database/index.js');
 const scrapeDb = require('./database/scraper.js');
-const ml = require('./learn/naiveBayes.js');
-
-ml.initClassifier();
+const { classifier } = require('./learn/naiveBayes.js');
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, './splash-client/dist')));
@@ -51,10 +49,10 @@ app.get('/api/classifications', auth.checkJWT, async (req, res) => {
   try {
     const prod_class = await db.getProductivityClass(app_name, window_title, user_name);
     if (prod_class === null && app_name === 'Google Chrome') { 
-      const predictedProdClass = ml.predictProductivityClass(window_title, user_name)
+      const predictedProdClass = classifier.predictProductivityClass(window_title, user_name)
       res.send({
         source: predictedProdClass ? 'ml' : 'user',
-        class: ml.predictProductivityClass(window_title, user_name)
+        class: predictedProdClass
       });
     } else {
       res.send({
@@ -76,12 +74,11 @@ app.post('/api/classifications', auth.checkJWT, async (req, res) => {
   try {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
-    const { learnProductivityClass, unlearnProductivityClass } = require('./learn/naiveBayes.js');
     if (result.old_prod_class && app_name === 'Google Chrome') { //recategorization
-      unlearnProductivityClass(window_title, result.old_prod_class);
-      learnProductivityClass(window_title, prod_class);
+      classifier.unlearnProductivityClass(window_title, result.old_prod_class);
+      classifier.learnProductivityClass(window_title, prod_class);
     } else if (app_name === 'Google Chrome') {
-      learnProductivityClass(window_title, prod_class)
+      classifier.learnProductivityClass(window_title, prod_class)
     }
     if (req.body.params.ml === 'affirm') {
       db.updateMachineLearningLog('affirm');
@@ -101,8 +98,7 @@ app.delete('/api/classifications', auth.checkJWT, async (req, res) => {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
     if (queryResult.rowCount > 0 && app_name === 'Google Chrome') { 
-      const { unlearnProductivityClass } = require('./learn/naiveBayes.js');
-      unlearnProductivityClass(window_title, prod_class);
+      classifier.unlearnProductivityClass(window_title, prod_class);
     }
   } catch(e) {
     console.error(e)
