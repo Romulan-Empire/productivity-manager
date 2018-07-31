@@ -19,7 +19,6 @@ exports.checkJWT = (req, res, next) => {
       return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' })
     };
     if (decoded.uid === userId) {
-      console.log('decoded token matches uid');
       next();
     } else {
       console.log('decoded token does NOT match uid...unauthorized')
