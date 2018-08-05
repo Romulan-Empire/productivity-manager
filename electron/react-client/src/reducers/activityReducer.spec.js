@@ -1,5 +1,7 @@
-const activities = require('./activityReducer.js');
+import activities from './activityReducer.js';
+console.log('activities is', activities)
 const { getDuration } = require('../constants.js');
+const assert = require('assert');
 
 describe('addActivity', () => {
   beforeEach(function() {
@@ -33,8 +35,10 @@ describe('addActivity', () => {
       app: 'Google Chrome',
       title: 'npm install broken · Issue #665 · ssbc/patchwork',
       spurts: [
-        {startTime: 'August 2nd 2018, 9:32:44 pm'},
-        {endTime: 'August 2nd 2018, 9:32:45 pm'}
+        {
+          startTime: 'August 2nd 2018, 9:32:44 pm',
+          endTime: 'August 2nd 2018, 9:32:45 pm'
+        }
       ],
       duration: getDuration("August 2nd 2018, 9:32:44 pm", "August 2nd 2018, 9:32:45 pm"),
       productivity: {
@@ -49,6 +53,7 @@ describe('addActivity', () => {
       distracting: [],
       nextId: 2
     };
+    // console.log('actual activity is', JSON.stringify(activities(initialState,action)));
     assert.deepEqual(activities(initialState, action), newState);
   });
 });
