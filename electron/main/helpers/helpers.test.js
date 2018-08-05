@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { stripEmoji, getDomainName } = require('../main/helpers/activitySanitizers');
-const { assembleActivity, chunkComplete } = require('../main/helpers/activityMonitor.js');
+const { stripEmoji, getDomainName } = require('./activitySanitizers');
+const { assembleActivity, chunkComplete } = require('./activityMonitor.js');
 
 describe('stripEmoji', () => {
   it('should remove speaker emojis from titles', () => {
