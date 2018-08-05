@@ -11,9 +11,9 @@ describe('stripEmoji', () => {
     const title = 'JavaScript Tutorial';
     assert.equal(stripEmoji(title), title);
   });
- });
+});
 
- describe('getDomainName', () => {
+describe('getDomainName', () => {
   it('should get domain titles from full http urls', () => {
     const url = 'https://developer.mozilla.org/en-US/';
     assert.equal(getDomainName(url), 'mozilla.org');
@@ -26,7 +26,7 @@ describe('stripEmoji', () => {
     const url = 'MDN Web Docs';
     assert.equal(getDomainName(url), url);
   });
- });
+});
 
 describe('assembleActivity', () => {
   it('properly assembles activities', () => {

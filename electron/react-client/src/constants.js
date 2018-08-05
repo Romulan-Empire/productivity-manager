@@ -12,3 +12,13 @@ export const stylePaper = {
   margin: '25px',
   verticalAlign: 'top'
 };
+
+import moment from 'moment';
+export const getDuration = (start, end) => {
+  return moment
+          .duration(
+            moment(end, "MMMM Do YYYY, h:mm:ss a")
+            .diff(moment(start, "MMMM Do YYYY, h:mm:ss a"))
+          )
+          .asSeconds();
+};

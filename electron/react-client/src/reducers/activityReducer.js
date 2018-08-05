@@ -1,6 +1,6 @@
 import { ADD_ACTIVITY, PATCH_ACTIVITY, CATEGORIZE_ACTIVITY,
         DELETE_ACTIVITY, SET_ALL_ACTIVITIES, AFFIRM_CATEGORIZATION } from '../actions/types'; 
-import moment from 'moment';
+import { getDuration } from '../constants.js';
 
 const initialState = {
   neutral: [],
@@ -127,15 +127,5 @@ const activities = (state = initialState, action) => {
   }
   
 }
-
-const getDuration = (start, end) => {
-  return moment
-          .duration(
-            moment(end, "MMMM Do YYYY, h:mm:ss a")
-            .diff(moment(start, "MMMM Do YYYY, h:mm:ss a"))
-          )
-          .asSeconds();
-}
-
 
 export default activities;
