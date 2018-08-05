@@ -14,6 +14,7 @@ const activities = (state = initialState, action) => {
   switch (action.type) {
     case ADD_ACTIVITY: {
       const {app, title, startTime, endTime, productivity} = action.payload
+      console.log('action.payload is', JSON.stringify(action.payload))
       const duration = getDuration(startTime, endTime)
       const convertedProd = {
         ...productivity,
