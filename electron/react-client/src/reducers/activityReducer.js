@@ -30,7 +30,7 @@ const activities = (state = initialState, action) => {
       return {
         ...state,
         [newData.productivity.class]: [...state[newData.productivity.class], newData],
-        nextId: ++state.nextId
+        nextId: state.nextId + 1
       }
     }
 
