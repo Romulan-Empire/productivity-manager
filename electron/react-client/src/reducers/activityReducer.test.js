@@ -9,6 +9,8 @@ describe('addActivity', () => {
     nextId: 1
   };
 
+  const initialStateCopy = {...initialState};
+
   const action = {
     type: 'ADD_ACTIVITY',
     payload: {
@@ -24,7 +26,11 @@ describe('addActivity', () => {
     }
   };
 
-  const newState = activities({...initialState}, action);
+  const newState = activities(initialState, action);
+
+  it('does not mutate the initial state', () => {
+    assert.deepEqual(initialState, initialStateCopy);
+  });
 
   it('adds the new activity to the proper category only', () => {
     assert.equal(newState.neutral.length, 0);
