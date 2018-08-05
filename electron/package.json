@@ -10,9 +10,10 @@
     "rebuildDB": "./node_modules/.bin/electron-rebuild -w sqlite3 -p",
     "package": "NODE_ENV=production electron-forge package main/index.js",
     "make": "NODE_ENV=production electron-forge make main/index.js",
-    "test": "jest main && jest react-client && mocha $(find spec -name '*.test.js')",
-    "unit-test": "jest main && jest react-client",
-    "int-test": "mocha $(find spec -name '*.test.js')"
+    "test": "jest && mocha $(find spec -name '*.int-test.js')",
+    "unit-test": "jest",
+    "int-test": "mocha $(find spec -name '*.int-test.js')",
+    "test-coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",

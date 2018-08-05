@@ -9,3 +9,4 @@ main/mainConfig.js
 config.js
 out
 database/sqlite.db
+coverage
