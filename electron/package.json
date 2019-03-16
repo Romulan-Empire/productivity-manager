@@ -43,6 +43,7 @@
       "electronPackagerConfig": {
         "packageManager": "npm",
         "name": "Thyme.ly",
+        "executableName": "thymely-client",
         "icon": "./leaf-icon.png.icns"
       },
       "electronWinstallerConfig": {
