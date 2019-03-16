@@ -22,7 +22,7 @@ class Classifier {
   }
 
   bulkLearn(activities) {
-    activities.filter(({ app_name, prod_class }) => app_name === 'Google Chrome' && prod_class !== 'neutral')
+    activities.filter(({ app_name, prod_class }) => (app_name === 'Google Chrome' || app_name === 'Chromium-browser') && prod_class !== 'neutral')
               .forEach(({window_title, prod_class}) => {
                 this.bayes.learn(window_title, prod_class);
               });

@@ -20,12 +20,12 @@ const client = new Client({
 });
 
 const getProductivityClass = async (appName, title, userName) => {
-  const queryStr = (appName === 'Google Chrome' ?
+  const queryStr = ((appName === 'Google Chrome' || appName === 'Chromium-browser') ?
                    `SELECT prod_class FROM public.categories where\
                    (app_name = $1) AND (user_name = $2) AND (window_title = $3)` :
                    `SELECT prod_class FROM public.categories where\
                    (app_name = $1) AND (user_name = $2)`);
-  const values = (appName === 'Google Chrome' ? [appName, userName, title] : [appName, userName]);
+  const values = ((appName === 'Google Chrome' || appName === 'Chromium-browser') ? [appName, userName, title] : [appName, userName]);
 
   try {
     const queryResult = await pool.query(queryStr, values);
@@ -70,12 +70,12 @@ const deleteProductivityClass = async ({user_name, app_name, window_title, prod_
 }
 
 const addProductivityClass = async ({user_name, app_name, window_title, prod_class}) => {
-  const queryStr = app_name === 'Google Chrome' ?
+  const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
                                 `INSERT INTO public.categories(user_name, app_name, window_title, prod_class)\
                                 VALUES ($1, $2, $3, $4)` : 
                                 `INSERT INTO public.categories(user_name, app_name, prod_class)\
                                 VALUES ($1, $2, $3)`;
-  const values = (app_name === 'Google Chrome' ?
+  const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
                               [user_name, app_name, window_title, prod_class]:
                               [user_name, app_name, prod_class]);
   try {
@@ -87,12 +87,12 @@ const addProductivityClass = async ({user_name, app_name, window_title, prod_cla
 };
 
 const changeProductivityClass = async ({user_name, app_name, window_title, prod_class, old_prod_class}) => {
-  const queryStr = app_name === 'Google Chrome' ?
+  const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
                                `UPDATE public.categories SET prod_class = $1\
                                 WHERE app_name = $2 AND window_title = $3` :
                                `UPDATE public.categories SET prod_class = $1\
                                 WHERE app_name = $2`;
-  const values = (app_name === 'Google Chrome' ?
+  const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
                               [prod_class, app_name, window_title]:
                               [prod_class, app_name]);
   try {
@@ -104,7 +104,7 @@ const changeProductivityClass = async ({user_name, app_name, window_title, prod_
 };
 
 const getBrowserActivities = () => {
-  const queryStr = `select app_name, window_title, prod_class from public.categories where app_name = 'Google Chrome'`;
+  const queryStr = `select app_name, window_title, prod_class from public.categories where app_name = 'Google Chrome' or app_name = 'Chromium-browswer'`;
   return pool.query(queryStr)
     .then(data => data.rows)
     .catch(err => console.error('error getting all browser titles', err))

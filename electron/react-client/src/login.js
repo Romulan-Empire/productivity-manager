@@ -34,6 +34,7 @@ const getJWT = (user) => {
   // get id token from firebase and post it to our server to get a jwt
   return user.getIdToken()
     .then((idToken) => {
+      console.log('serverURL is', serverURL)
       return axios.post(serverURL + '/session', {idToken});
     });
 };
