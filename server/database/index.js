@@ -1,22 +1,14 @@
-const chalk = require('chalk');
-const { Pool, Client } = require('pg');
+require('dotenv').config();
+const { Pool } = require('pg');
 const moment = require('moment');
-const { user, host, database, password, port } = require('../config.js');
 
 const pool = new Pool({
-  user,
-  host,
-  database,
-  password,
-  port
-});
-
-const client = new Client({
-  user,
-  host,
-  database,
-  password,
-  port
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
+  ssl: true,
 });
 
 const getProductivityClass = async (appName, title, userName) => {
