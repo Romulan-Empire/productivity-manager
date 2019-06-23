@@ -4,7 +4,7 @@
   "description": "Productivity Manager (Server)",
   "main": "index.js",
   "scripts": {
-    "production-mode": "pm2 start index.js",
+    "production-mode": "nodemon index.js",
     "install-pm2": "npm install pm2 -g",
     "dev": "nodemon index.js",
     "scrape": "node ./workers/scraper.js"
