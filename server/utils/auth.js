@@ -12,8 +12,7 @@ exports.checkJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).send('NO TOKEN PROVIDED!');
 
-  const userId = authHeader.split(' ')[0];
-  const jwtToken = authHeader.split(' ')[1];
+  const [userId, jwtToken] = authHeader.split(' ');
   jwt.verify(jwtToken, secret, function(err, decoded) {
     if (err) {
       console.log('error decoding jwt', err);
