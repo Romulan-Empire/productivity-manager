@@ -52,7 +52,7 @@ app.get('/api/classifications', auth.checkJWT, async (req, res) => {
 
   try {
     const prod_class = await db.getProductivityClass(app_name, window_title, user_name);
-    if (prod_class === null && app_name === 'Google Chrome') { 
+    if (prod_class === null && (app_name === 'Google Chrome' || app_name === 'Chromium-browser')) { 
       const predictedProdClass = classifier.predictProductivityClass(window_title, user_name)
       res.send({
         source: predictedProdClass ? 'ml' : 'user',
@@ -78,10 +78,10 @@ app.post('/api/classifications', auth.checkJWT, async (req, res) => {
   try {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
-    if (result.old_prod_class && app_name === 'Google Chrome') { //recategorization
+    if (result.old_prod_class && (app_name === 'Google Chrome' || app_name === 'Chromium-browser')) { //recategorization
       classifier.unlearnProductivityClass(window_title, result.old_prod_class);
       classifier.learnProductivityClass(window_title, prod_class);
-    } else if (app_name === 'Google Chrome') {
+    } else if (app_name === 'Google Chrome' || app_name === 'Chromium-browser') {
       classifier.learnProductivityClass(window_title, prod_class)
     }
     if (req.body.params.ml === 'affirm') {
@@ -101,7 +101,7 @@ app.delete('/api/classifications', auth.checkJWT, async (req, res) => {
   try {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
-    if (queryResult.rowCount > 0 && app_name === 'Google Chrome') { 
+    if (queryResult.rowCount > 0 && (app_name === 'Google Chrome' || app_name === 'Chromium-browser')) { 
       classifier.unlearnProductivityClass(window_title, prod_class);
     }
   } catch(e) {
