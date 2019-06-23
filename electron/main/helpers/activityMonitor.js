@@ -21,7 +21,7 @@ const timestamp = () => {
 const assembleActivity = (activeWinObj) => {
   const app = activeWinObj.owner.name
   let title = sanitizers.stripEmoji(activeWinObj.title); // filter out the sound playing emoji
-  title = (app === "Google Chrome") ? sanitizers.sanitizeTitle(title) : title
+  title = (app === 'Google Chrome' || app === 'Chromium-browser') ? sanitizers.sanitizeTitle(title) : title
   return {
     id: activeWinObj.id,
     app,
