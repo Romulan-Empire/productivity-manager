@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Productivity Manager",
   "scripts": {
+    "preinstall": "cd server && npm install && npm install nodemon -g",
+    "start": "cd server && npm run production-mode",
     "electron-dev": "cd electron && npm start",
     "server-dev": "cd server && npm run dev",
     "local-electron-dev": "NODE_ENV=localhost npm run electron-dev",
