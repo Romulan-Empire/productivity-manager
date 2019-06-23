@@ -23,5 +23,7 @@
   },
   "homepage": "https://github.com/Romulan-Empire/productivity-manager#readme",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "dotenv": "^8.0.0"
+  }
 }
