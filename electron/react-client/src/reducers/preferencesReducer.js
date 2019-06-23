@@ -1,7 +1,7 @@
 import { TRACK_APP_TITLE, UNTRACK_APP_TITLE } from '../actions/types'; 
 
 const initialState = {
-  trackedApps: ['Google Chrome', 'Firefox', 'Safari', 'Idle']
+  trackedApps: ['Google Chrome', 'Chromium-browser', 'Firefox', 'Safari', 'Idle']
 }
 
 const preferences = (state = initialState, action) => {

@@ -15,20 +15,28 @@
       <img src="./leaf-icon.png" id="leaf-icon">
       <h1>Thyme.ly</h1>
       <h4>Because there's no time like the present</h4>
-      <form class="register-form">
+      <form class="register">
         <input type="text" id="reg-name" placeholder="name"/>
         <input type="text" id="reg-email" placeholder="email address"/>
         <input type="password" id="reg-password" placeholder="password"/>
         <button type="button" id="register">create</button>
-        <p class="message">Already registered? <a href="#">Sign In</a></p>
+        <p class="message">Already registered? <a href="#" class="login">Sign In</a></p>
+        <p class="message" style="text-align:center">Forgot your password? <a href="#" class="reset">Get an email to reset it</a></p>
       </form>
-      <form class="login-form">
+      <form class="login">
         <input type="text" id="email" placeholder="email address"/>
         <input type="password" id="password" placeholder="password"/>
         <button type="button" id="login">login</button>
-        <p class="message" style="text-align:center;">Not registered? <a href="#">Create an account</a></p>
+        <p class="message" style="text-align:center">Not registered? <a href="#" class="register">Create an account</a></p>
+        <p class="message" style="text-align:center">Forgot your password? <a href="#" class="reset">Get an email to reset it</a></p>      
       </form>
-    </div>
+      <form class="reset">
+        <input type="text" id="reset-email" placeholder="email address"/>
+        <button type="button" id="reset">get reset link</button>
+        <p class="message">Remember your password? <a href="#" class="login">Sign In</a></p>
+        <p class="message" style="text-align:center">Not registered? <a href="#" class="register">Create an account</a></p>
+      </form>
+      </div>
     </div>
   <script>
     require('../src/login.js')
