@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+console.log(process.env.PORT)
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -23,11 +27,11 @@ app.use((req, res, next) => {
 });
 
 const admin = require('firebase-admin');
-const serviceAccount = require('./firebaseConfig.json');
+const { firebaseServiceAccount } = require('./utils/firebase.js');
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://thymely-cd776.firebaseio.com'
+  credential: admin.credential.cert(firebaseServiceAccount),
+  databaseURL: process.env.FIREBASE_DB_URL,
 });
 
 app.post('/session', (req, res) => {

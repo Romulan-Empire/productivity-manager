@@ -1,5 +1,4 @@
 import activities from './activityReducer.js';
-import assert from 'assert';
 
 describe('addActivity', () => {
   const initialState = {
@@ -8,7 +7,8 @@ describe('addActivity', () => {
     distracting: [],
     nextId: 1
   };
-
+  
+  // to test that the reducer doesn't mutate initial state
   const initialStateCopy = {...initialState};
 
   const action = {
@@ -28,37 +28,39 @@ describe('addActivity', () => {
 
   const newState = activities(initialState, action);
 
-  it('does not mutate the initial state', () => {
-    assert.deepEqual(initialState, initialStateCopy);
+  //TODO: Add another scenario where initialState is already populated
+
+  test('does not mutate the initial state', () => {
+    expect(initialState).toEqual(initialStateCopy);
   });
 
-  it('adds the new activity to the proper category only', () => {
-    assert.equal(newState.neutral.length, 0);
-    assert.equal(newState.productive.length, 1);
-    assert.equal(newState.distracting.length, 0);
+  test('adds the new activity to the proper category only', () => {
+    expect(newState.neutral.length).toBe(0);
+    expect(newState.productive.length).toBe(1);
+    expect(newState.distracting.length).toBe(0);
   });
   
-  it(`converts the new activity's start and end time into spurts`, () => {
+  test(`converts the new activity's start and end time into spurts`, () => {
     const { startTime, endTime } = action.payload;
     const newActivity = newState.productive[0];
-    assert.equal(newActivity.spurts[0].startTime, startTime);
-    assert.equal(newActivity.spurts[0].endTime, endTime);
+    expect(newActivity.spurts[0].startTime).toBe(startTime);
+    expect(newActivity.spurts[0].endTime).toBe(endTime);
   });
 
-  it(`otherwise copies the new activity's data into state`, () => {
+  test(`otherwise copies the new activity's data into state`, () => {
     const { app, productivity, title } = action.payload;
     const newActivity = newState.productive[0];
-    assert.equal(newActivity.app, app);
-    assert.equal(newActivity.title, title);
-    assert.deepEqual(newActivity.productivity, productivity);
+    expect(newActivity.app).toBe(app);
+    expect(newActivity.title).toBe(title);
+    expect(newActivity.productivity).toEqual(productivity);
   });
 
-  it('assigns the last nextId to the new activity', () => {
+  test('assigns the last nextId to the new activity', () => {
     const newActivity = newState.productive[0];
-    assert.equal(initialState.nextId, newActivity.id);
+    expect(newActivity.id).toBe(initialState.nextId);
   });
 
-  it('properly increments nextId', () => {
-    assert.equal(initialState.nextId + 1, newState.nextId, 'wtf');
+  test('properly increments nextId', () => {
+    expect(newState.nextId).toBe(initialState.nextId + 1);
   });
 });

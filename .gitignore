@@ -9,3 +9,5 @@ config.js
 
 serverConfig.js
 react-client/dist/bundle.js
+
+.env

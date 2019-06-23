@@ -7,7 +7,7 @@
     "server-dev": "cd server && npm run dev",
     "local-electron-dev": "NODE_ENV=localhost npm run electron-dev",
     "mock-production-electron-dev": "NODE_ENV=production npm run electron-dev",
-    "test": "cd electron && mocha $(find spec -name '*.spec.js')"
+    "test": "cd electron && npm test"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,7 @@
   },
   "homepage": "https://github.com/Romulan-Empire/productivity-manager#readme",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "dotenv": "^8.0.0"
+  }
 }
