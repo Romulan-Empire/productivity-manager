@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Romulan-Empire/productivity-manager#readme",
   "devDependencies": {
+    "jest": "^24.8.0",
     "pm2": "^2.10.4"
   },
   "dependencies": {

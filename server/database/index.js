@@ -11,6 +11,15 @@ const pool = new Pool({
   ssl: true,
 });
 
+// TODO: Use as wrapper for all the try/catches
+const withCatch = async (fn) => {
+  try {
+    return await fn;
+  } catch(e) {
+    console.error('db error', e);
+  }
+};
+
 const getProductivityClass = async (appName, title, userName) => {
   const queryStr = ((appName === 'Google Chrome' || appName === 'Chromium-browser') ?
                    `SELECT prod_class FROM public.categories where\
@@ -116,7 +125,7 @@ exports.getProductivityClass = getProductivityClass;
 exports.deleteProductivityClass = deleteProductivityClass;
 exports.addOrChangeProductivity = addOrChangeProductivity;
 exports.getBrowserActivities = getBrowserActivities;
-exports.pool = pool;
+exports.pool = pool; // Shouldn't need to do this, keep pool private
 exports.updateMachineLearningLog = updateMachineLearningLog;
 
 
