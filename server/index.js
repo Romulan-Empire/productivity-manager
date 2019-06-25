@@ -1,6 +1,7 @@
 require('dotenv').config();
 
-console.log(process.env.PORT)
+console.log('test db is', process.env.TEST_PG_DATABASE)
+console.log('real db is', process.env.PG_DATABASE)
 
 const express = require('express');
 const path = require('path');

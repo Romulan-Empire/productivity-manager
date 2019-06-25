@@ -14,11 +14,97 @@ const pool = new Pool({
 // TODO: Use as wrapper for all the try/catches
 const withCatch = async (fn) => {
   try {
-    return await fn;
+    return await fn();
   } catch(e) {
+    // sentry log?
     console.error('db error', e);
   }
 };
+
+class Store {
+  constructor(connection) {
+    // connection is an intialized PG client or pool
+    this.pg = connection;
+    this.browserApps = ['Google Chrome', 'Chromium-browser']; // replace with user tracked settings
+  }
+
+  appIsBrowser(appName) {
+    return this.browserApps.includes(appName);
+  }
+
+  async getProductivityClass(appName, title, userName) {
+    const queryStr = this.appIsBrowser(appName) ?
+        `SELECT prod_class FROM public.categories where (app_name = $1) AND (user_name = $2) AND (window_title = $3)` :
+        `SELECT prod_class FROM public.categories where (app_name = $1) AND (user_name = $2)`;
+    const values = this.appIsBrowser(appName) ? [appName, userName, title] : [appName, userName];
+
+    return withCatch(async () => {
+      const queryResult = await this.pg.query(queryStry, values);
+      if (queryResult.rows.length) return queryResult.rows[0].prod_class;
+      else return null;
+    })
+    // try {
+    //   const queryResult = await this.pg.query(queryStr, values);
+    //   if (queryResult.rows.length) return queryResult.rows[0].prod_class;
+    //   else return null;
+    // } catch (e) {
+    //   console.error('error in looking up prod_class', e)
+    //   return null;
+    // }
+  }
+
+  async changeProductivityClass({user_name, app_name, window_title, prod_class, old_prod_class}) {
+    const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
+                                 `UPDATE public.categories SET prod_class = $1\
+                                  WHERE app_name = $2 AND window_title = $3` :
+                                 `UPDATE public.categories SET prod_class = $1\
+                                  WHERE app_name = $2`;
+    const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
+                                [prod_class, app_name, window_title]:
+                                [prod_class, app_name]);
+    try {
+      const queryResult = await this.pg.query(queryStr, values);
+      return {queryResult, app_name, window_title, prod_class, old_prod_class};
+    } catch (e) {
+      console.error('error in changing prod_class', e)
+    }
+  }
+
+  async addProductivityClass({user_name, app_name, window_title, prod_class}) {
+    const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
+                                  `INSERT INTO public.categories(user_name, app_name, window_title, prod_class)\
+                                  VALUES ($1, $2, $3, $4)` : 
+                                  `INSERT INTO public.categories(user_name, app_name, prod_class)\
+                                  VALUES ($1, $2, $3)`;
+    const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
+                                [user_name, app_name, window_title, prod_class]:
+                                [user_name, app_name, prod_class]);
+    try {
+      // TODO: Nothing with 'this.pg' is working properly
+      debugger
+      console.log('my cxn is', this.pg)
+      const queryResult = await this.pg.query(queryStr, values);
+      return {queryResult, app_name, window_title, prod_class};
+    } catch (e) {
+      console.error('error in adding prod_class', e)
+    }
+  }
+
+  async addOrChangeProductivity(query) {
+    const { app_name, window_title, user_name, isTracked } = query;
+
+    try {
+      const savedProdClass = await this.getProductivityClass(app_name, window_title, user_name);
+      if (savedProdClass) {
+        return await this.changeProductivityClass(query);
+      } else {
+        return await this.addProductivityClass(query);
+      }
+    } catch(e) {
+      console.error('error checking for productivity!', e);
+    }
+  }
+}
 
 const getProductivityClass = async (appName, title, userName) => {
   const queryStr = ((appName === 'Google Chrome' || appName === 'Chromium-browser') ?
@@ -38,7 +124,7 @@ const getProductivityClass = async (appName, title, userName) => {
   }
 };
 
-const addOrChangeProductivity = async (query) => {
+const addOrChangeProductivity = async (query) => { // TODO: the args should be clearer, not just passing the whole query, unless using typescript
   const { app_name, window_title, user_name, isTracked } = query;
 
   try {
@@ -129,5 +215,5 @@ exports.pool = pool; // Shouldn't need to do this, keep pool private
 exports.updateMachineLearningLog = updateMachineLearningLog;
 
 
-
+exports.Store = Store;
 
