@@ -11,12 +11,12 @@ const pool = new Pool({
   ssl: true,
 });
 
-// TODO: Use as wrapper for all the try/catches
+// TODO: Rename to withLog and have a second param for the variables to log
 const withCatch = async (fn) => {
   try {
     return await fn();
   } catch(e) {
-    // sentry log?
+    // sentry log if in prod?
     console.error('db error', e);
   }
 };
@@ -107,119 +107,20 @@ class Store {
     const values = [moment().format(), action];
 
     return withCatch(async () => {
-      const queryResult = await this.pg.query(queryStr, value);
+      await this.pg.query(queryStr, value);
     })
   }
 }
 
-const getProductivityClass = async (appName, title, userName) => {
-  const queryStr = ((appName === 'Google Chrome' || appName === 'Chromium-browser') ?
-                   `SELECT prod_class FROM public.categories where\
-                   (app_name = $1) AND (user_name = $2) AND (window_title = $3)` :
-                   `SELECT prod_class FROM public.categories where\
-                   (app_name = $1) AND (user_name = $2)`);
-  const values = ((appName === 'Google Chrome' || appName === 'Chromium-browser') ? [appName, userName, title] : [appName, userName]);
-
-  try {
-    const queryResult = await pool.query(queryStr, values);
-    if (queryResult.rows.length) return queryResult.rows[0].prod_class;
-    else return null;
-  } catch (e) {
-    console.error('error in looking up prod_class', e)
-    return null;
-  }
-};
-
-const addOrChangeProductivity = async (query) => { // TODO: the args should be clearer, not just passing the whole query, unless using typescript
-  const { app_name, window_title, user_name, isTracked } = query;
-
-  try {
-    const savedProdClass = await getProductivityClass(app_name, window_title, user_name);
-    if (savedProdClass) {
-      return await changeProductivityClass(query);
-    } else {
-      return await addProductivityClass(query);
-    }
-  } catch(e) {
-    console.error('error checking for productivity!', e);
-  }
-};
-
-const deleteProductivityClass = async ({user_name, app_name, window_title, prod_class, isTracked}) => {
-  let queryStr;
-  if (isTracked) {
-    queryStr = `DELETE FROM public.categories WHERE user_name='${user_name}' AND app_name='${app_name}' AND window_title='${window_title}'`;
-  } else {
-    queryStr = `DELETE FROM public.categories WHERE user_name='${user_name}' AND app_name='${app_name}'`;
-  }
-  const values = [user_name, app_name, window_title, prod_class, isTracked];
-
-  try {
-    const queryResult = await pool.query(queryStr);
-    return {queryResult, app_name, window_title, prod_class};
-  } catch (e) {
-    console.error('error in deleting prod-class', e)
-  }
-}
-
-const addProductivityClass = async ({user_name, app_name, window_title, prod_class}) => {
-  const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                                `INSERT INTO public.categories(user_name, app_name, window_title, prod_class)\
-                                VALUES ($1, $2, $3, $4)` : 
-                                `INSERT INTO public.categories(user_name, app_name, prod_class)\
-                                VALUES ($1, $2, $3)`;
-  const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                              [user_name, app_name, window_title, prod_class]:
-                              [user_name, app_name, prod_class]);
-  try {
-    const queryResult = await pool.query(queryStr, values);
-    return {queryResult, app_name, window_title, prod_class};
-  } catch (e) {
-    console.error('error in adding prod_class', e)
-  }
-};
-
-const changeProductivityClass = async ({user_name, app_name, window_title, prod_class, old_prod_class}) => {
-  const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                               `UPDATE public.categories SET prod_class = $1\
-                                WHERE app_name = $2 AND window_title = $3` :
-                               `UPDATE public.categories SET prod_class = $1\
-                                WHERE app_name = $2`;
-  const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                              [prod_class, app_name, window_title]:
-                              [prod_class, app_name]);
-  try {
-    const queryResult = await pool.query(queryStr, values);
-    return {queryResult, app_name, window_title, prod_class, old_prod_class};
-  } catch (e) {
-    console.error('error in changing prod_class', e)
-  }
-};
-
-const getBrowserActivities = () => {
-  const queryStr = `select app_name, window_title, prod_class from public.categories where app_name = 'Google Chrome' or app_name = 'Chromium-browswer'`;
-  return pool.query(queryStr)
-    .then(data => data.rows)
-    .catch(err => console.error('error getting all browser titles', err))
-};
-
-const updateMachineLearningLog = async (action) => {
-  const queryStr = `insert into public.machine_learning_log(timestamp, action) values($1, $2)`;
-  const value = [moment().format(), action];
-  try {
-    const queryResult = await pool.query(queryStr, value);
-  } catch(e) {
-    console.log('error trying to update ML log', e);
-  }
-};
-
-exports.getProductivityClass = getProductivityClass;
-exports.deleteProductivityClass = deleteProductivityClass;
-exports.addOrChangeProductivity = addOrChangeProductivity;
-exports.getBrowserActivities = getBrowserActivities;
-exports.pool = pool; // Shouldn't need to do this, keep pool private
-exports.updateMachineLearningLog = updateMachineLearningLog;
-
-
+// for testing
 exports.Store = Store;
 
+// for use in rest of app
+const s = new Store(pool);
+
+// temporary way to keep the exports of this file the same as before
+exports.getProductivityClass = s.getProductivityClass.bind(s);
+exports.deleteProductivityClass = s.deleteProductivityClass.bind(s);
+exports.addOrChangeProductivity = s.addOrChangeProductivity.bind(s);
+exports.getBrowserActivities = s.getBrowserActivities.bind(s);
+exports.updateMachineLearningLog = s.updateMachineLearningLog.bind(s);
