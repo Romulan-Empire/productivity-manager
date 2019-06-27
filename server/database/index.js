@@ -25,7 +25,7 @@ class Store {
   constructor(connection) {
     // connection is an intialized PG client or pool
     this.pg = connection;
-    this.browserApps = ['Google Chrome', 'Chromium-browser']; // replace with user tracked settings
+    this.browserApps = ['Google Chrome', 'Chromium-browser']; // TODO: replace with user tracked settings
   }
 
   appIsBrowser(appName) {
@@ -39,70 +39,75 @@ class Store {
     const values = this.appIsBrowser(appName) ? [appName, userName, title] : [appName, userName];
 
     return withCatch(async () => {
-      const queryResult = await this.pg.query(queryStry, values);
+      const queryResult = await this.pg.query(queryStr, values);
       if (queryResult.rows.length) return queryResult.rows[0].prod_class;
       else return null;
-    })
-    // try {
-    //   const queryResult = await this.pg.query(queryStr, values);
-    //   if (queryResult.rows.length) return queryResult.rows[0].prod_class;
-    //   else return null;
-    // } catch (e) {
-    //   console.error('error in looking up prod_class', e)
-    //   return null;
-    // }
-  }
-
-  async changeProductivityClass({user_name, app_name, window_title, prod_class, old_prod_class}) {
-    const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                                 `UPDATE public.categories SET prod_class = $1\
-                                  WHERE app_name = $2 AND window_title = $3` :
-                                 `UPDATE public.categories SET prod_class = $1\
-                                  WHERE app_name = $2`;
-    const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                                [prod_class, app_name, window_title]:
-                                [prod_class, app_name]);
-    try {
-      const queryResult = await this.pg.query(queryStr, values);
-      return {queryResult, app_name, window_title, prod_class, old_prod_class};
-    } catch (e) {
-      console.error('error in changing prod_class', e)
-    }
+    });
   }
 
   async addProductivityClass({user_name, app_name, window_title, prod_class}) {
-    const queryStr = (app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                                  `INSERT INTO public.categories(user_name, app_name, window_title, prod_class)\
-                                  VALUES ($1, $2, $3, $4)` : 
-                                  `INSERT INTO public.categories(user_name, app_name, prod_class)\
-                                  VALUES ($1, $2, $3)`;
-    const values = ((app_name === 'Google Chrome' || app_name === 'Chromium-browser') ?
-                                [user_name, app_name, window_title, prod_class]:
-                                [user_name, app_name, prod_class]);
-    try {
-      // TODO: Nothing with 'this.pg' is working properly
-      debugger
-      console.log('my cxn is', this.pg)
+    const queryStr = this.appIsBrowser(app_name) ?
+      `INSERT INTO public.categories(user_name, app_name, window_title, prod_class) VALUES ($1, $2, $3, $4)` : 
+      `INSERT INTO public.categories(user_name, app_name, prod_class) VALUES ($1, $2, $3)`;
+    const values = this.appIsBrowser(app_name) ?
+      [user_name, app_name, window_title, prod_class] :
+      [user_name, app_name, prod_class];
+
+    return withCatch(async () => {
       const queryResult = await this.pg.query(queryStr, values);
       return {queryResult, app_name, window_title, prod_class};
-    } catch (e) {
-      console.error('error in adding prod_class', e)
-    }
+    })
+  }
+
+  async changeProductivityClass({user_name, app_name, window_title, prod_class, old_prod_class}) {
+    const queryStr = this.appIsBrowser(app_name) ?
+        `UPDATE public.categories SET prod_class = $1 WHERE app_name = $2 AND window_title = $3` :
+        `UPDATE public.categories SET prod_class = $1 WHERE app_name = $2`;
+    const values = this.appIsBrowser(app_name) ? [prod_class, app_name, window_title] : [prod_class, app_name];
+
+    return withCatch(async () => {
+      const queryResult = await this.pg.query(queryStr, values);
+      return {queryResult, app_name, window_title, prod_class, old_prod_class};
+    });
   }
 
   async addOrChangeProductivity(query) {
     const { app_name, window_title, user_name, isTracked } = query;
 
-    try {
+    return withCatch(async () => {
       const savedProdClass = await this.getProductivityClass(app_name, window_title, user_name);
-      if (savedProdClass) {
-        return await this.changeProductivityClass(query);
-      } else {
-        return await this.addProductivityClass(query);
-      }
-    } catch(e) {
-      console.error('error checking for productivity!', e);
-    }
+      savedProdClass ? await this.changeProductivityClass(query) : await this.addProductivityClass(query);
+    });
+  }
+
+  async deleteProductivityClass({user_name, app_name, window_title, prod_class, isTracked}) {
+    const queryStr = isTracked ? 
+     `DELETE FROM public.categories WHERE user_name = $1 AND app_name = $2 AND window_title = $3` :
+     `DELETE FROM public.categories WHERE user_name = $1 AND app_name = $2`;
+    const values = isTracked ? [user_name, app_name, window_title] : [user_name. app_name];
+
+    return withCatch(async () => {
+      const queryResult = await this.pg.query(queryStr, values);
+      return {queryResult, app_name, window_title, prod_class};
+    });
+  }
+
+  async getBrowserActivities() {
+    // TODO: Programtically assemble this queryStr
+    const queryStr = `select app_name, window_title, prod_class from public.categories where app_name = 'Google Chrome' or app_name = 'Chromium-browswer'`;
+    return withCatch(async () => {
+      const queryResult = await this.pg.query(queryStr);
+      return queryResult.rows;
+    })
+  }
+
+  async updateMachineLearningLog(action) {
+    const queryStr = `insert into public.machine_learning_log(timestamp, action) values($1, $2)`;
+    const values = [moment().format(), action];
+
+    return withCatch(async () => {
+      const queryResult = await this.pg.query(queryStr, value);
+    })
   }
 }
 
