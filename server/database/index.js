@@ -59,6 +59,7 @@ class Store {
     })
   }
 
+  // TODO: Get rid of unused params like old_prod_class
   async changeProductivityClass({user_name, app_name, window_title, prod_class, old_prod_class}) {
     const queryStr = this.appIsBrowser(app_name) ?
         `UPDATE public.categories SET prod_class = $1 WHERE app_name = $2 AND window_title = $3` :
@@ -84,7 +85,7 @@ class Store {
     const queryStr = isTracked ? 
      `DELETE FROM public.categories WHERE user_name = $1 AND app_name = $2 AND window_title = $3` :
      `DELETE FROM public.categories WHERE user_name = $1 AND app_name = $2`;
-    const values = isTracked ? [user_name, app_name, window_title] : [user_name. app_name];
+    const values = isTracked ? [user_name, app_name, window_title] : [user_name, app_name];
 
     return withCatch(async () => {
       const queryResult = await this.pg.query(queryStr, values);
