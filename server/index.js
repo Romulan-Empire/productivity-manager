@@ -1,16 +1,11 @@
 require('dotenv').config();
 
-console.log('test db is', process.env.TEST_PG_DATABASE)
-console.log('real db is', process.env.PG_DATABASE)
-
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const partials = require('express-partials');
 const app = express();
 const port = process.env.PORT || 3000;
-const moment = require('moment');
-const chalk = require('chalk');
 
 const auth = require('./utils/auth.js');
 const db = require('./database/index.js');
@@ -74,17 +69,21 @@ app.get('/api/classifications', auth.checkJWT, async (req, res) => {
 });
 
 app.post('/api/classifications', auth.checkJWT, async (req, res) => {
-  const result = await db.addOrChangeProductivity(req.body.params);
-
   try {
+    const result = await db.addOrChangeProductivity(req.body.params);
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
-    if (result.old_prod_class && (app_name === 'Google Chrome' || app_name === 'Chromium-browser')) { //recategorization
-      classifier.unlearnProductivityClass(window_title, result.old_prod_class);
+
+    // update machine learning after sending the result back to the user
+    if (db.appIsBrowser(app_name)) {
       classifier.learnProductivityClass(window_title, prod_class);
-    } else if (app_name === 'Google Chrome' || app_name === 'Chromium-browser') {
-      classifier.learnProductivityClass(window_title, prod_class)
+      // unclearn the old productivity class if this was a recategorization
+      if (result.old_prod_class) {
+        classifier.learnProductivityClass(window_title, prod_class);
+      }
     }
+
+    // update machine learning log to keep track of accuracy
     if (req.body.params.ml === 'affirm') {
       db.updateMachineLearningLog('affirm');
     } else if (req.body.params.wasML) {
@@ -102,7 +101,7 @@ app.delete('/api/classifications', auth.checkJWT, async (req, res) => {
   try {
     const { queryResult, window_title, app_name, prod_class } = result;
     res.send(queryResult);
-    if (queryResult.rowCount > 0 && (app_name === 'Google Chrome' || app_name === 'Chromium-browser')) { 
+    if (queryResult.rowCount > 0 && db.appIsBrowser(app_name)) { 
       classifier.unlearnProductivityClass(window_title, prod_class);
     }
   } catch(e) {
