@@ -53,7 +53,7 @@ app.get('/api/classifications', auth.checkJWT, async (req, res) => {
 
   try {
     const prod_class = await db.getProductivityClass(app_name, window_title, user_name);
-    if (prod_class === null && (app_name === 'Google Chrome' || app_name === 'Chromium-browser')) { 
+    if (prod_class === null && db.appIsBrowser(app_name)) { 
       const predictedProdClass = classifier.predictProductivityClass(window_title, user_name)
       res.send({
         source: predictedProdClass ? 'ml' : 'user',

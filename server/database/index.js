@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 const moment = require('moment');
+const { withCatch } = require('../utils/errors.js');
 
 const pool = new Pool({
   user: process.env.PG_USER,
@@ -10,16 +11,6 @@ const pool = new Pool({
   port: process.env.PG_PORT,
   ssl: true,
 });
-
-// TODO: Rename to withLog and have a second param for the variables to log
-const withCatch = async (fn) => {
-  try {
-    return await fn();
-  } catch(e) {
-    // sentry log if in prod?
-    console.error('db error', e);
-  }
-};
 
 class Store {
   constructor(connection) {
@@ -56,7 +47,7 @@ class Store {
     return withCatch(async () => {
       const queryResult = await this.pg.query(queryStr, values);
       return {queryResult, app_name, window_title, prod_class};
-    })
+    });
   }
 
   // TODO: Get rid of unused params like old_prod_class
@@ -68,6 +59,7 @@ class Store {
 
     return withCatch(async () => {
       const queryResult = await this.pg.query(queryStr, values);
+      // TODO: See if there's a consistent way to return values so it can be standardized
       return {queryResult, app_name, window_title, prod_class, old_prod_class};
     });
   }
@@ -124,3 +116,5 @@ exports.deleteProductivityClass = s.deleteProductivityClass.bind(s);
 exports.addOrChangeProductivity = s.addOrChangeProductivity.bind(s);
 exports.getBrowserActivities = s.getBrowserActivities.bind(s);
 exports.updateMachineLearningLog = s.updateMachineLearningLog.bind(s);
+
+exports.appIsBrowser = s.appIsBrowser.bind(s);

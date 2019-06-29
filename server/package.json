@@ -4,9 +4,9 @@
   "description": "Productivity Manager (Server)",
   "main": "index.js",
   "scripts": {
-    "production-mode": "nodemon index.js",
+    "production-mode": "NODE_ENV=production nodemon index.js",
     "install-pm2": "npm install pm2 -g",
-    "dev": "nodemon index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
     "scrape": "node ./workers/scraper.js",
     "test": "jest --setupFiles dotenv/config"
   },
