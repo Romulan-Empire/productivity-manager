@@ -4,7 +4,6 @@ const moment = require('moment');
 const electron = require('electron');
 const { ipcMain, session } = electron;
 const axios = require('axios');
-const chalk = require('chalk');
 const path = require('path');
 const url = require('url');
 
@@ -64,7 +63,6 @@ const monitorActivity = (activities, user, jwt) => {
         return axios.get(serverURL + '/api/classifications', {headers, params: qs})
           .then((resp) => {
             if (typeof resp.data !== 'object') {
-              console.log(chalk.blue('RECEIVED PROD OBJ FROM SERVER THAT IS NOT OBJECT!'));
               console.log('received this instead', resp.data)
             }
             return {
